@@ -407,8 +407,8 @@
             flex-wrap: wrap;
             gap: 8px;
             justify-content: center;
-            max-height: 180px; /* compress so no internal scroll is needed */
-            overflow-y: hidden;
+            max-height: 40vh; /* allow more content on tablets/phones */
+            overflow-y: auto; /* enable vertical scroll to reach all tiles */
             -webkit-overflow-scrolling: touch;
             flex-shrink: 0;
             box-shadow: 
@@ -416,6 +416,7 @@
                 inset -2px -2px 6px rgba(0,0,0,0.1),
                 0 -4px 12px rgba(0,0,0,0.15);
             position: relative;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .dock-tile {
             padding: 12px 16px;
@@ -1442,9 +1443,9 @@
                 target.style.zIndex = '50';
             }
             handlePointerMove(e) {
-                e.preventDefault();
-                
+                // Only prevent default (which blocks scrolling) when we are actually dragging a tile
                 if (!this.draggedTile) return;
+                e.preventDefault();
                 
                 if (!this.isDragging) {
                     this.isDragging = true;
@@ -2078,6 +2079,18 @@
                 
                 modal.innerHTML = styles + modal.innerHTML;
                 document.body.appendChild(modal);
+
+                // Remove accessibility-related section(s) from instructions by heading text
+                try {
+                    const headings = modal.querySelectorAll('.instruction-section h3');
+                    headings.forEach(h => {
+                        const t = (h.textContent || '').trim();
+                        if (t && t.includes('נגיש')) {
+                            const sec = h.closest('.instruction-section');
+                            if (sec) sec.remove();
+                        }
+                    });
+                } catch (err) { /* no-op */ }
                 
                 // Close modal when clicking outside
                 modal.addEventListener('click', (e) => {
