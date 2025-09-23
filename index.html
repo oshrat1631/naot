@@ -2090,6 +2090,14 @@
                             if (sec) sec.remove();
                         }
                     });
+                    // Remove any sentences or list items that claim mobile support
+                    const mobileNodes = modal.querySelectorAll('.instructions-body li, .instructions-body p, .instructions-body h3, .instructions-body h4');
+                    mobileNodes.forEach(n => {
+                        const t = (n.textContent || '').trim();
+                        if (/מובייל/i.test(t) || /mobile/i.test(t)) {
+                            n.remove();
+                        }
+                    });
                 } catch (err) { /* no-op */ }
                 
                 // Close modal when clicking outside
