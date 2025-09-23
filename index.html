@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>׳׳•׳×׳™׳•׳× ׳ ׳¢׳•׳× ׳׳•׳ ׳˜׳¡׳•׳¨׳™׳•׳×</title>
+    <title>אותיות נעות מונטסוריות</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Noto+Sans+Hebrew:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --band-h: 95px;        /* ׳’׳•׳‘׳” ׳¨׳¦׳•׳¢׳× ׳”׳›׳×׳™׳‘׳” */
-            --red-gap: 25px;       /* ׳׳¨׳•׳•׳— ׳¦׳¨ ׳‘׳™׳ ׳׳”׳§׳•׳× */
-            --red-anchor: 15px;    /* ׳¢׳•׳’׳ ׳׳ ׳›׳™ ׳׳’׳¨׳™׳“ */
-            --blue-gap: 61px;      /* ׳¨׳•׳—׳‘ ׳¨׳¦׳•׳¢׳× ׳”׳›׳—׳•׳׳™׳ */
+            --band-h: 95px;        /* גובה רצועת הכתיבה */
+            --red-gap: 25px;       /* מרווח צר בין להקות */
+            --red-anchor: 15px;    /* עוגן אנכי לגריד */
+            --blue-gap: 61px;      /* רוחב רצועת הכחולים */
             --tile-font: 'Frank Ruhl Libre', 'Noto Sans Hebrew', 'Rubik', sans-serif;
             --red-color: #d32f2f;
             --blue-color: #1976d2;
@@ -20,9 +20,9 @@
             --band-color: #e3f2fd;
             --line-color: #f44336;
             --bg-color: #fff9f0; /* very light cream */
-            /* ׳׳—׳–׳•׳¨ ׳×׳§׳ ׳™ ׳׳›׳ ׳”׳׳”׳§׳•׳× */
+            /* מחזור תקני לכל הלהקות */
             --period: calc(var(--band-h) + var(--red-gap));
-            /* ׳׳™׳§׳•׳ ׳›׳—׳•׳׳™׳ ׳‘׳™׳—׳¡ ׳׳׳—׳–׳•׳¨ */
+            /* מיקום כחולים ביחס למחזור */
             --blue-top: calc((var(--band-h) - var(--blue-gap)) / 2);
             --blue-bottom: calc((var(--band-h) + var(--blue-gap)) / 2);
         }
@@ -190,9 +190,9 @@
             right: 0;
             bottom: 0;
             background-color: var(--bg-color);
-            /* ׳“׳₪׳•׳¡ ׳§׳‘׳•׳¢ ׳׳›׳ ׳”׳’׳‘׳”׳™׳: ׳©׳™׳׳•׳© ׳‘-background-size ׳•-position */
+            /* דפוס קבוע לכל הגבהים: שימוש ב-background-size ו-position */
             background-image:
-                /* ׳׳“׳•׳: ׳§׳• ׳¢׳׳™׳•׳ ׳•׳×׳—׳×׳•׳ */
+                /* אדום: קו עליון ותחתון */
                 linear-gradient(
                     to bottom,
                     transparent 0,
@@ -205,7 +205,7 @@
                     var(--red-color) calc(var(--band-h)),
                     transparent calc(var(--band-h))
                 ),
-                /* ׳›׳—׳•׳ ׳¢׳׳™׳•׳ (׳˜׳¨׳™׳₪׳׳˜ ׳“׳§ ׳¡׳‘׳™׳‘ ׳”׳§׳•) */
+                /* כחול עליון (טריפלט דק סביב הקו) */
                 linear-gradient(
                     to bottom,
                     transparent 0,
@@ -218,7 +218,7 @@
                     var(--blue-color) calc(var(--blue-top) + 2px),
                     transparent calc(var(--blue-top) + 2px)
                 ),
-                /* ׳›׳—׳•׳ ׳×׳—׳×׳•׳ (׳˜׳¨׳™׳₪׳׳˜ ׳“׳§ ׳¡׳‘׳™׳‘ ׳”׳§׳•) */
+                /* כחול תחתון (טריפלט דק סביב הקו) */
                 linear-gradient(
                     to bottom,
                     transparent 0,
@@ -367,22 +367,22 @@
             transform-origin: center;
         }
         /* Extra-narrow side grab area specifically for Qubuts */
-        .tile.nikud[data-char="ײ»"] {
+        .tile.nikud[data-char="ֻ"] {
             width: 48px;
         }
         /* Extra-narrow side grab area for small marks (segol/tsere/hiriq/sheva) */
-        .tile.nikud[data-char="ײ¶"],
-        .tile.nikud[data-char="ײµ"],
-        .tile.nikud[data-char="ײ´"],
-        .tile.nikud[data-char="ײ°"] {
+        .tile.nikud[data-char="ֶ"],
+        .tile.nikud[data-char="ֵ"],
+        .tile.nikud[data-char="ִ"],
+        .tile.nikud[data-char="ְ"] {
             width: 42px;
         }
         /* Narrow group for patah/qamats/hataf marks */
-        .tile.nikud[data-char="ײ·"],
-        .tile.nikud[data-char="ײ¸"],
-        .tile.nikud[data-char="ײ²"],
-        .tile.nikud[data-char="ײ±"],
-        .tile.nikud[data-char="ײ³"] {
+        .tile.nikud[data-char="ַ"],
+        .tile.nikud[data-char="ָ"],
+        .tile.nikud[data-char="ֲ"],
+        .tile.nikud[data-char="ֱ"],
+        .tile.nikud[data-char="ֳ"] {
             width: 48px;
         }
         .tile.nikud img {
@@ -416,8 +416,8 @@
                 inset -2px -2px 6px rgba(0,0,0,0.1),
                 0 -4px 12px rgba(0,0,0,0.15);
             position: relative;
-            padding-bottom: calc(env(safe-area-inset-bottom) + 140px); /* extra space so last row is easy to tap */
-            scroll-padding-bottom: 140px;
+            padding-bottom: calc(env(safe-area-inset-bottom) + 96px); /* extra space so last row is easy to tap */
+            scroll-padding-bottom: 96px;
         }
         .dock-tile {
             padding: 12px 16px;
@@ -833,13 +833,19 @@
             .image-display { max-height: 28vh; }
             /* Ensure sidebar can scroll if tall */
             .sidebar { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-            .dock { max-height: none; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            .dock {
+                max-height: none;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: calc(env(safe-area-inset-bottom) + 96px); /* extra space so last row is easy to tap */
+                scroll-padding-bottom: 96px;
+            }
             .sidebar-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
             .sidebar-actions button { width: 100%; }
             .sidebar-dock-container { margin-top: 12px; }
         }
 
-        /* Target iPad/tablets specifically (769ג€“1024px): keep dock visible, enable scrolling */
+        /* Target iPad/tablets specifically (769–1024px): keep dock visible, enable scrolling */
         @media (min-width: 769px) and (max-width: 1024px) {
             .content-area { flex-direction: row-reverse; }
             .menu-toggle { display: none; }
@@ -1002,15 +1008,15 @@
 <body>
     <div class="app">
         <div class="toolbar">
-            <input type="text" id="teacherWord" placeholder="׳›׳×׳•׳‘ ׳׳™׳׳” ׳׳”׳¢׳×׳§׳”..." />
-            <button id="undoBtn" aria-label="׳‘׳™׳˜׳•׳ ׳”׳₪׳¢׳•׳׳” ׳”׳׳—׳¨׳•׳ ׳”">ג†¶ ׳‘׳™׳˜׳•׳</button>
-            <button id="redoBtn" aria-label="׳‘׳™׳¦׳•׳¢ ׳׳—׳“׳© ׳©׳ ׳”׳₪׳¢׳•׳׳” ׳”׳׳—׳¨׳•׳ ׳”">ג†· ׳—׳–׳¨׳”</button>
-            <button id="clearBtn">׳ ׳§׳” ׳”׳›׳</button>
-            <button id="clearNikudBtn">׳ ׳§׳” ׳ ׳™׳§׳•׳“</button>
-            <button id="printBtn">נ–¨ן¸ ׳”׳“׳₪׳¡</button>
-            <button id="instructionsBtn">נ“– ׳”׳•׳¨׳׳•׳×</button>
-            <button id="removeImageBtn">נ—‘ן¸ ׳”׳¡׳¨ ׳×׳׳•׳ ׳”</button>
-            <div class="copyright">׳›׳ ׳”׳–׳›׳•׳™׳•׳× ׳©׳׳•׳¨׳•׳× ׳׳׳•׳©׳¨׳× ׳¨׳•׳</div>
+            <input type="text" id="teacherWord" placeholder="כתוב מילה להעתקה..." />
+            <button id="undoBtn" aria-label="ביטול הפעולה האחרונה">↶ ביטול</button>
+            <button id="redoBtn" aria-label="ביצוע מחדש של הפעולה האחרונה">↷ חזרה</button>
+            <button id="clearBtn">נקה הכל</button>
+            <button id="clearNikudBtn">נקה ניקוד</button>
+            <button id="printBtn">🖨️ הדפס</button>
+            <button id="instructionsBtn">📖 הוראות</button>
+            <button id="removeImageBtn">🗑️ הסר תמונה</button>
+            <div class="copyright">כל הזכויות שמורות לאושרת רון</div>
         </div>
         
         <div class="content-area">
@@ -1028,78 +1034,78 @@
                 <div class="dock" id="dock">
                     <!-- Hebrew letters section -->
                     <div class="dock-section">
-                        <div class="dock-section-title">׳׳•׳×׳™׳•׳× ׳¢׳‘׳¨׳™׳×</div>
+                        <div class="dock-section-title">אותיות עברית</div>
                         <div class="dock-section-content">
-                            <div class="dock-tile red" data-char="׳">׳</div>
-                            <div class="dock-tile red" data-char="׳‘">׳‘</div>
-                            <div class="dock-tile red" data-char="׳’">׳’</div>
-                            <div class="dock-tile red" data-char="׳“">׳“</div>
-                            <div class="dock-tile red" data-char="׳”">׳”</div>
-                            <div class="dock-tile red" data-char="׳•">׳•</div>
-                            <div class="dock-tile red" data-char="׳–">׳–</div>
-                            <div class="dock-tile red" data-char="׳—">׳—</div>
-                            <div class="dock-tile red" data-char="׳˜">׳˜</div>
-                            <div class="dock-tile red" data-char="׳™">׳™</div>
-                            <div class="dock-tile red" data-char="׳›">׳›</div>
-                            <div class="dock-tile red" data-char="׳">׳</div>
-                            <div class="dock-tile red" data-char="׳">׳</div>
-                            <div class="dock-tile red" data-char="׳ ">׳ </div>
-                            <div class="dock-tile red" data-char="׳¡">׳¡</div>
-                            <div class="dock-tile red" data-char="׳¢">׳¢</div>
-                            <div class="dock-tile red" data-char="׳₪">׳₪</div>
-                            <div class="dock-tile red" data-char="׳¦">׳¦</div>
-                            <div class="dock-tile red" data-char="׳§">׳§</div>
-                            <div class="dock-tile red" data-char="׳¨">׳¨</div>
-                            <div class="dock-tile red" data-char="׳©">׳©</div>
-                            <div class="dock-tile red" data-char="׳×">׳×</div>
+                            <div class="dock-tile red" data-char="א">א</div>
+                            <div class="dock-tile red" data-char="ב">ב</div>
+                            <div class="dock-tile red" data-char="ג">ג</div>
+                            <div class="dock-tile red" data-char="ד">ד</div>
+                            <div class="dock-tile red" data-char="ה">ה</div>
+                            <div class="dock-tile red" data-char="ו">ו</div>
+                            <div class="dock-tile red" data-char="ז">ז</div>
+                            <div class="dock-tile red" data-char="ח">ח</div>
+                            <div class="dock-tile red" data-char="ט">ט</div>
+                            <div class="dock-tile red" data-char="י">י</div>
+                            <div class="dock-tile red" data-char="כ">כ</div>
+                            <div class="dock-tile red" data-char="ל">ל</div>
+                            <div class="dock-tile red" data-char="מ">מ</div>
+                            <div class="dock-tile red" data-char="נ">נ</div>
+                            <div class="dock-tile red" data-char="ס">ס</div>
+                            <div class="dock-tile red" data-char="ע">ע</div>
+                            <div class="dock-tile red" data-char="פ">פ</div>
+                            <div class="dock-tile red" data-char="צ">צ</div>
+                            <div class="dock-tile red" data-char="ק">ק</div>
+                            <div class="dock-tile red" data-char="ר">ר</div>
+                            <div class="dock-tile red" data-char="ש">ש</div>
+                            <div class="dock-tile red" data-char="ת">ת</div>
                             
                             <!-- Final letters -->
-                            <div class="dock-tile red" data-char="׳">׳</div>
-                            <div class="dock-tile red" data-char="׳">׳</div>
-                            <div class="dock-tile red" data-char="׳">׳</div>
-                            <div class="dock-tile red" data-char="׳£">׳£</div>
-                            <div class="dock-tile red" data-char="׳¥">׳¥</div>
+                            <div class="dock-tile red" data-char="ך">ך</div>
+                            <div class="dock-tile red" data-char="ם">ם</div>
+                            <div class="dock-tile red" data-char="ן">ן</div>
+                            <div class="dock-tile red" data-char="ף">ף</div>
+                            <div class="dock-tile red" data-char="ץ">ץ</div>
                             
                             <!-- Dagesh letters -->
-                            <div class="dock-tile red" data-char="׳‘ײ¼">׳‘ײ¼</div>
-                            <div class="dock-tile red" data-char="׳›ײ¼">׳›ײ¼</div>
-                            <div class="dock-tile red" data-char="׳₪ײ¼">׳₪ײ¼</div>
-                            <div class="dock-tile red" data-char="׳©׳">׳©׳</div>
-                            <div class="dock-tile red" data-char="׳©׳‚">׳©׳‚</div>
+                            <div class="dock-tile red" data-char="בּ">בּ</div>
+                            <div class="dock-tile red" data-char="כּ">כּ</div>
+                            <div class="dock-tile red" data-char="פּ">פּ</div>
+                            <div class="dock-tile red" data-char="שׁ">שׁ</div>
+                            <div class="dock-tile red" data-char="שׂ">שׂ</div>
                         </div>
                     </div>
                     <!-- Nikud section -->
                     <div class="dock-section">
-                        <div class="dock-section-title">׳¡׳™׳׳ ׳™ ׳ ׳™׳§׳•׳“</div>
+                        <div class="dock-section-title">סימני ניקוד</div>
                         <div class="dock-section-content">
-                            <div class="dock-tile blue nikud" data-char="ײ·">
+                            <div class="dock-tile blue nikud" data-char="ַ">
                                 <img src="images/patah.png" alt="Patah">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ¸">
+                            <div class="dock-tile blue nikud" data-char="ָ">
                                 <img src="images/qamats.png" alt="Qamats">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ¶">
+                            <div class="dock-tile blue nikud" data-char="ֶ">
                                 <img src="images/segol.png" alt="Segol">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײµ">
+                            <div class="dock-tile blue nikud" data-char="ֵ">
                                 <img src="images/tsere.png" alt="Tsere">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ´">
+                            <div class="dock-tile blue nikud" data-char="ִ">
                                 <img src="images/hiriq.png" alt="Hiriq">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ»">
+                            <div class="dock-tile blue nikud" data-char="ֻ">
                                 <img src="images/qubuts.png" alt="Qubuts">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ°">
+                            <div class="dock-tile blue nikud" data-char="ְ">
                                 <img src="images/sheva.png" alt="Sheva">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ²">
+                            <div class="dock-tile blue nikud" data-char="ֲ">
                                 <img src="images/hataf-patah.png" alt="Hataf Patah">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ±">
+                            <div class="dock-tile blue nikud" data-char="ֱ">
                                 <img src="images/hataf-segol.png" alt="Hataf Segol">
                             </div>
-                            <div class="dock-tile blue nikud" data-char="ײ³">
+                            <div class="dock-tile blue nikud" data-char="ֳ">
                                 <img src="images/hataf-qamats.png" alt="Hataf Qamats">
                             </div>
 
@@ -1107,20 +1113,20 @@
                     </div>
                     <!-- Reading aids section -->
                     <div class="dock-section">
-                        <div class="dock-section-title">׳¢׳–׳¨׳™ ׳§׳¨׳™׳׳”</div>
+                        <div class="dock-section-title">עזרי קריאה</div>
                         <div class="dock-section-content">
-                            <div class="dock-tile blue dot" data-char="ג—">ג—</div>
-                            <div class="dock-tile blue dot small" data-char="ג—¦">ג—¦</div>
-                            <div class="dock-tile blue" data-char="׳">׳</div>
-                            <div class="dock-tile blue" data-char="׳”">׳”</div>
-                            <div class="dock-tile blue" data-char="׳•ײ¹">׳•ײ¹</div>
-                            <div class="dock-tile blue" data-char="׳•ײ¼">׳•ײ¼</div>
-                            <div class="dock-tile blue" data-char="׳™">׳™</div>
+                            <div class="dock-tile blue dot" data-char="●">●</div>
+                            <div class="dock-tile blue dot small" data-char="◦">◦</div>
+                            <div class="dock-tile blue" data-char="א">א</div>
+                            <div class="dock-tile blue" data-char="ה">ה</div>
+                            <div class="dock-tile blue" data-char="וֹ">וֹ</div>
+                            <div class="dock-tile blue" data-char="וּ">וּ</div>
+                            <div class="dock-tile blue" data-char="י">י</div>
                         </div>
                     </div>
                     <!-- Punctuation section -->
                     <div class="dock-section">
-                        <div class="dock-section-title">׳¡׳™׳׳ ׳™ ׳₪׳™׳¡׳•׳§</div>
+                        <div class="dock-section-title">סימני פיסוק</div>
                         <div class="dock-section-content">
                             <div class="dock-tile black" data-char=".">.</div>
                             <div class="dock-tile black" data-char=",">,</div>
@@ -1128,9 +1134,9 @@
                             <div class="dock-tile black" data-char=":">:</div>
                             <div class="dock-tile black" data-char="?">?</div>
                             <div class="dock-tile black" data-char="!">!</div>
-                            <div class="dock-tile black" data-char="׳´">׳´</div>
-                            <div class="dock-tile black" data-char="׳³">׳³</div>
-                            <div class="dock-tile black" data-char="ג€¦">ג€¦</div>
+                            <div class="dock-tile black" data-char="״">״</div>
+                            <div class="dock-tile black" data-char="׳">׳</div>
+                            <div class="dock-tile black" data-char="…">…</div>
                             <div class="dock-tile black" data-char="(">(</div>
                             <div class="dock-tile black" data-char=")">)</div>
                             <div class="dock-tile black" data-char="[">[</div>
@@ -1141,7 +1147,7 @@
                             <div class="dock-tile black" data-char="/">/</div>
                             <div class="dock-tile black" data-char='"'>"</div>
                             <div class="dock-tile black" data-char="'">'</div>
-                            <div class="dock-tile black" data-char="ג€¢">ג€¢</div>
+                            <div class="dock-tile black" data-char="•">•</div>
                         </div>
                     </div>
                 </div>
@@ -1149,28 +1155,28 @@
             
             <div class="sidebar">
                 <div class="image-display" id="imageDisplay">
-                    <div class="placeholder">׳’׳¨׳•׳¨ ׳×׳׳•׳ ׳” ׳׳›׳׳</div>
-                    <div class="drop-zone" id="dropZone">׳©׳—׳¨׳¨ ׳›׳׳ ׳׳”׳¢׳׳׳× ׳×׳׳•׳ ׳”</div>
+                    <div class="placeholder">גרור תמונה לכאן</div>
+                    <div class="drop-zone" id="dropZone">שחרר כאן להעלאת תמונה</div>
                 </div>
-                <button class="upload-btn" id="uploadImageBtn">׳”׳¢׳׳” ׳×׳׳•׳ ׳”</button>
+                <button class="upload-btn" id="uploadImageBtn">העלה תמונה</button>
                 <input type="file" id="imageInput" class="file-input" accept="image/*" />
             </div>
         </div>
         
-        <div class="trash-bin" id="trashBin">נ—‘ן¸</div>
+        <div class="trash-bin" id="trashBin">🗑️</div>
         
         <div class="context-menu" id="contextMenu">
-            <button id="duplicateBtn">׳©׳›׳₪׳</button>
+            <button id="duplicateBtn">שכפל</button>
         </div>
     
     </div>
     <script>
         /*
         ================================================================
-        ׳׳–׳”׳¨׳× ׳–׳›׳•׳™׳•׳× ׳™׳•׳¦׳¨׳™׳
+        אזהרת זכויות יוצרים
         ================================================================
-        ׳›׳ ׳”׳–׳›׳•׳™׳•׳× ׳©׳׳•׳¨׳•׳× ׳׳׳•׳©׳¨׳× ׳¨׳•׳.
-        ׳׳™׳ ׳׳¢׳©׳•׳× ׳©׳™׳׳•׳© ׳‘׳§׳•׳“ ׳–׳” ׳‘׳׳™ ׳¨׳©׳•׳× ׳׳₪׳•׳¨׳©׳×.
+        כל הזכויות שמורות לאושרת רון.
+        אין לעשות שימוש בקוד זה בלי רשות מפורשת.
         ================================================================
         */
         
@@ -1227,7 +1233,7 @@
                 tray.className = 'side-dock';
                 const title = document.createElement('div');
                 title.className = 'side-dock-title';
-                title.textContent = '׳¡׳™׳׳ ׳™ ׳ ׳™׳§׳•׳“ ׳•׳¡׳™׳׳ ׳™ ׳₪׳™׳¡׳•׳§';
+                title.textContent = 'סימני ניקוד וסימני פיסוק';
                 const grid = document.createElement('div');
                 grid.className = 'side-dock-grid';
                 tray.appendChild(title);
@@ -1254,13 +1260,13 @@
                 temp.style.whiteSpace = 'nowrap';
                 
                 // Test with letters that represent the full height range of Hebrew letters
-                // Including tall letters (׳, ׳§, ׳£, ׳¥) and letters with descenders
-                temp.textContent = '׳׳§׳£׳¥׳‘׳›׳¡';
+                // Including tall letters (ל, ק, ף, ץ) and letters with descenders
+                temp.textContent = 'לקףץבכס';
                 document.body.appendChild(temp);
                 
                 // Measure both height and ascender/descender info
                 const fullHeight = temp.offsetHeight;
-                const textMetrics = this.getTextMetrics('׳׳§׳£׳¥׳‘׳›׳¡', '85px var(--tile-font)');
+                const textMetrics = this.getTextMetrics('לקףץבכס', '85px var(--tile-font)');
                 
                 document.body.removeChild(temp);
                 
@@ -1338,7 +1344,7 @@
                 if (printBtn) {
                     // On iPad, prefer screenshot over print
                     if (this.isIOSiPad()) {
-                        try { printBtn.textContent = '׳¦׳™׳׳•׳ ׳׳¡׳'; } catch (_) {}
+                        try { printBtn.textContent = 'צילום מסך'; } catch (_) {}
                     }
                     printBtn.addEventListener('click', () => {
                         if (this.isIOSiPad()) {
@@ -1395,7 +1401,7 @@
             }
             handleImageUpload(file) {
                 if (!file || !file.type.startsWith('image/')) {
-                    this.showNotification('׳׳ ׳ ׳‘׳—׳¨ ׳§׳•׳‘׳¥ ׳×׳׳•׳ ׳” ׳×׳§׳™׳');
+                    this.showNotification('אנא בחר קובץ תמונה תקין');
                     return;
                 }
                 
@@ -1550,16 +1556,16 @@
             getNikudImagePath(char) {
                 // Map niqqud characters to their corresponding image files
                 const nikudMap = {
-                    'ײ·': 'images/patah.png',      // Patah
-                    'ײ¸': 'images/qamats.png',     // Qamats
-                    'ײ¶': 'images/segol.png',      // Segol
-                    'ײµ': 'images/tsere.png',      // Tsere
-                    'ײ´': 'images/hiriq.png',      // Hiriq
-                    'ײ»': 'images/qubuts.png',     // Qubuts
-                    'ײ°': 'images/sheva.png',      // Sheva
-                    'ײ²': 'images/hataf-patah.png', // Hataf Patah
-                    'ײ±': 'images/hataf-segol.png', // Hataf Segol
-                    'ײ³': 'images/hataf-qamats.png' // Hataf Qamats
+                    'ַ': 'images/patah.png',      // Patah
+                    'ָ': 'images/qamats.png',     // Qamats
+                    'ֶ': 'images/segol.png',      // Segol
+                    'ֵ': 'images/tsere.png',      // Tsere
+                    'ִ': 'images/hiriq.png',      // Hiriq
+                    'ֻ': 'images/qubuts.png',     // Qubuts
+                    'ְ': 'images/sheva.png',      // Sheva
+                    'ֲ': 'images/hataf-patah.png', // Hataf Patah
+                    'ֱ': 'images/hataf-segol.png', // Hataf Segol
+                    'ֳ': 'images/hataf-qamats.png' // Hataf Qamats
                 };
                 return nikudMap[char] || null;
             }
@@ -1794,16 +1800,16 @@
                     };
                     img.src = this.uploadedImage;
                 } else {
-                    imageDisplay.innerHTML = '<div class="placeholder">׳’׳¨׳•׳¨ ׳×׳׳•׳ ׳” ׳׳›׳׳</div>';
+                    imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
                 }
             }
             clearAll() {
                 if (this.tiles.length === 0) {
-                    this.showNotification('׳”׳׳•׳— ׳›׳‘׳¨ ׳¨׳™׳§!');
+                    this.showNotification('הלוח כבר ריק!');
                     return;
                 }
                 
-                if (confirm('׳”׳׳ ׳׳×׳” ׳‘׳˜׳•׳— ׳©׳‘׳¨׳¦׳•׳ ׳ ׳׳ ׳§׳•׳× ׳׳× ׳›׳ ׳”׳׳•׳—?')) {
+                if (confirm('האם אתה בטוח שברצונך לנקות את כל הלוח?')) {
                     // Clear all tiles from DOM
                     this.tiles.forEach(tile => {
                         if (tile && tile.parentNode) {
@@ -1816,7 +1822,7 @@
                     
                     // Save the cleared state
                     this.saveState();
-                    this.showNotification('׳”׳׳•׳— ׳ ׳•׳§׳” ׳‘׳”׳¦׳׳—׳”');
+                    this.showNotification('הלוח נוקה בהצלחה');
                 }
             }
             clearNikud() {
@@ -1824,11 +1830,11 @@
                 const nikudTiles = this.tiles.filter(tile => tile.classList.contains('nikud'));
                 
                 if (nikudTiles.length === 0) {
-                    this.showNotification('׳׳™׳ ׳¡׳™׳׳ ׳™ ׳ ׳™׳§׳•׳“ ׳׳”׳¡׳¨׳”!');
+                    this.showNotification('אין סימני ניקוד להסרה!');
                     return;
                 }
                 
-                if (confirm('׳”׳׳ ׳׳×׳” ׳‘׳˜׳•׳— ׳©׳‘׳¨׳¦׳•׳ ׳ ׳׳׳—׳•׳§ ׳׳× ׳›׳ ׳¡׳™׳׳ ׳™ ׳”׳ ׳™׳§׳•׳“?')) {
+                if (confirm('האם אתה בטוח שברצונך למחוק את כל סימני הניקוד?')) {
                     // Remove nikud tiles from DOM
                     nikudTiles.forEach(tile => {
                         if (tile && tile.parentNode) {
@@ -1841,7 +1847,7 @@
                     
                     // Save the cleared state
                     this.saveState();
-                    this.showNotification(`׳ ׳׳—׳§׳• ${nikudTiles.length} ׳¡׳™׳׳ ׳™ ׳ ׳™׳§׳•׳“`);
+                    this.showNotification(`נמחקו ${nikudTiles.length} סימני ניקוד`);
                 }
             }
             createPrintLines() {
@@ -1912,63 +1918,63 @@
                 modal.innerHTML = `
                     <div class="instructions-content">
                         <div class="instructions-header">
-                            <h2>נ“– ׳”׳•׳¨׳׳•׳× ׳©׳™׳׳•׳© - ׳׳•׳×׳™׳•׳× ׳ ׳¢׳•׳× ׳׳•׳ ׳˜׳¡׳•׳¨׳™</h2>
-                            <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">ֳ—</button>
+                            <h2>📖 הוראות שימוש - אותיות נעות מונטסורי</h2>
+                            <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
                         </div>
                         <div class="instructions-body">
                             <div class="instruction-section">
-                                <h3>נ“ ׳׳•׳×׳™׳•׳× ׳ ׳¢׳•׳× ׳‘׳’׳™׳©׳” ׳”׳׳•׳ ׳˜׳¡׳•׳¨׳™׳×</h3>
+                                <h3>🎓 אותיות נעות בגישה המונטסורית</h3>
                                 <ul>
-                                    <li>׳’׳™׳©׳× ׳׳•׳ ׳˜׳¡׳•׳¨׳™ ׳׳“׳’׳™׳©׳” ׳׳™׳׳•׳“ ׳—׳•׳©׳™-׳׳•׳˜׳•׳¨׳™ ׳©׳ ׳§׳¨׳™׳׳” ׳•׳›׳×׳™׳‘׳”</li>
-                                    <li>׳”׳׳•׳×׳™׳•׳× ׳”׳ ׳¢׳•׳× ׳׳׳₪׳©׳¨׳•׳× ׳׳™׳׳“׳™׳ ׳׳‘׳ ׳•׳× ׳׳™׳׳™׳ ׳‘׳׳•׳₪׳ ׳₪׳™׳–׳™ ׳•׳—׳•׳©׳™</li>
-                                    <li>׳”׳’׳™׳©׳” ׳׳¢׳•׳“׳“׳× ׳׳™׳׳•׳“ ׳¢׳¦׳׳׳™ ׳•׳׳™׳׳•׳“ ׳‘׳§׳¦׳‘ ׳”׳׳™׳©׳™ ׳©׳ ׳”׳™׳׳“</li>
-                                    <li>׳™׳™׳©׳•׳ ׳“׳™׳’׳™׳˜׳׳™ ׳–׳” ׳׳‘׳™׳ ׳׳× ׳”׳—׳•׳•׳™׳” ׳”׳׳•׳ ׳˜׳¡׳•׳¨׳™׳× ׳׳׳¡׳</li>
+                                    <li>גישת מונטסורי מדגישה לימוד חושי-מוטורי של קריאה וכתיבה</li>
+                                    <li>האותיות הנעות מאפשרות לילדים לבנות מילים באופן פיזי וחושי</li>
+                                    <li>הגישה מעודדת לימוד עצמאי ולימוד בקצב האישי של הילד</li>
+                                    <li>יישום דיגיטלי זה מביא את החוויה המונטסורית למסך</li>
                                 </ul>
                             </div>
 
                             <div class="instruction-section">
-                                <h3>נ–±ן¸ ׳׳™׳ ׳׳”׳©׳×׳׳© ׳‘׳׳₪׳׳™׳§׳¦׳™׳”</h3>
+                                <h3>🖱️ איך להשתמש באפליקציה</h3>
                                 <ul>
-                                    <li><strong>׳’׳¨׳™׳¨׳× ׳׳•׳×׳™׳•׳×:</strong> ׳׳—׳¦׳• ׳¢׳ ׳׳•׳× ׳‘׳׳—׳¡׳ ׳”׳׳•׳×׳™׳•׳× ׳•׳’׳¨׳¨׳• ׳׳•׳×׳” ׳׳׳•׳—</li>
-                                    <li><strong>׳”׳•׳¡׳₪׳× ׳ ׳™׳§׳•׳“:</strong> ׳’׳¨׳¨׳• ׳¡׳™׳׳ ׳™ ׳ ׳™׳§׳•׳“ ׳׳×׳—׳× ׳׳׳•׳×׳™׳•׳×</li>
-                                    <li><strong>׳”׳¢׳׳׳× ׳×׳׳•׳ ׳•׳×:</strong> ׳’׳¨׳¨׳• ׳×׳׳•׳ ׳” ׳׳׳–׳•׳¨ ׳”׳™׳׳ ׳™ ׳׳• ׳׳—׳¦׳• ׳¢׳ '׳”׳¢׳׳” ׳×׳׳•׳ ׳”'</li>
-                                    <li><strong>׳›׳×׳™׳‘׳× ׳׳™׳׳™׳:</strong> ׳”׳§׳׳™׳“׳• ׳׳™׳׳” ׳‘׳×׳™׳‘׳× ׳”׳˜׳§׳¡׳˜ ׳”׳¢׳׳™׳•׳ ׳” ׳›׳“׳™ ׳׳”׳¦׳™׳’׳”</li>
-                                    <li><strong>׳׳—׳™׳§׳× ׳׳•׳×׳™׳•׳×:</strong> ׳’׳¨׳¨׳• ׳׳•׳×׳™׳•׳× ׳׳• ׳¡׳™׳׳ ׳™ ׳ ׳™׳§׳•׳“ ׳׳₪׳— ׳”׳׳©׳₪׳” ׳›׳“׳™ ׳׳׳—׳•׳§ ׳׳•׳×׳</li>
+                                    <li><strong>גרירת אותיות:</strong> לחצו על אות במחסן האותיות וגררו אותה ללוח</li>
+                                    <li><strong>הוספת ניקוד:</strong> גררו סימני ניקוד מתחת לאותיות</li>
+                                    <li><strong>העלאת תמונות:</strong> גררו תמונה לאזור הימני או לחצו על 'העלה תמונה'</li>
+                                    <li><strong>כתיבת מילים:</strong> הקלידו מילה בתיבת הטקסט העליונה כדי להציגה</li>
+                                    <li><strong>מחיקת אותיות:</strong> גררו אותיות או סימני ניקוד לפח האשפה כדי למחוק אותם</li>
                                 </ul>
                             </div>
 
                             <div class="instruction-section copyright-section">
-                                <h3>ֲ© ׳–׳›׳•׳™׳•׳× ׳™׳•׳¦׳¨׳™׳ ׳•׳©׳™׳׳•׳©</h3>
+                                <h3>© זכויות יוצרים ושימוש</h3>
                                 <ul>
-                                    <li><strong>׳›׳ ׳”׳–׳›׳•׳™׳•׳× ׳©׳׳•׳¨׳•׳× ׳׳׳•׳©׳¨׳× ׳¨׳•׳</strong></li>
-                                    <li>׳”׳©׳™׳׳•׳© ׳‘׳™׳™׳©׳•׳׳•׳ ׳׳•׳×׳¨ ׳¨׳§ ׳‘׳”׳¡׳›׳׳× ׳”׳׳₪׳×׳—׳×</li>
-                                    <li>׳׳™׳ ׳׳”׳¢׳×׳™׳§, ׳׳©׳ ׳•׳× ׳׳• ׳׳”׳₪׳™׳¥ ׳׳× ׳”׳™׳™׳©׳•׳׳•׳ ׳׳׳ ׳¨׳©׳•׳× ׳׳₪׳•׳¨׳©׳×</li>
-                                    <li>׳׳©׳׳׳•׳× ׳•׳‘׳§׳©׳•׳× ׳¨׳™׳©׳•׳™ - ׳¦׳¨׳• ׳§׳©׳¨ ׳¢׳ ׳׳•׳©׳¨׳× ׳¨׳•׳</li>
+                                    <li><strong>כל הזכויות שמורות לאושרת רון</strong></li>
+                                    <li>השימוש ביישומון מותר רק בהסכמת המפתחת</li>
+                                    <li>אין להעתיק, לשנות או להפיץ את היישומון ללא רשות מפורשת</li>
+                                    <li>לשאלות ובקשות רישוי - צרו קשר עם אושרת רון</li>
                                 </ul>
                             </div>
 
                             <div class="instruction-section">
-                                <h3>נ“± ׳ ׳’׳™׳©׳•׳× ׳•׳׳•׳‘׳™׳™׳</h3>
+                                <h3>📱 נגישות ומובייל</h3>
                                 <ul>
-                                    <li>ג“ ׳”׳׳₪׳׳™׳§׳¦׳™׳” ׳׳•׳×׳׳׳× ׳׳׳›׳©׳™׳¨׳™ ׳׳•׳‘׳™׳™׳ ׳•׳˜׳׳‘׳׳˜</li>
-                                    <li>ג“ ׳’׳¨׳™׳¨׳” ׳‘׳ ׳’׳™׳¢׳” ׳•׳‘׳¢׳›׳‘׳¨</li>
-                                    <li>ג“ ׳›׳₪׳×׳•׳¨׳™׳ ׳’׳“׳•׳׳™׳ ׳׳©׳™׳׳•׳© ׳ ׳•׳—</li>
-                                    <li>ג“ ׳×׳׳™׳›׳” ׳‘׳”׳“׳₪׳¡׳” ׳׳›׳ ׳”׳׳›׳©׳™׳¨׳™׳</li>
+                                    <li>✓ האפליקציה מותאמת למכשירי מובייל וטאבלט</li>
+                                    <li>✓ גרירה בנגיעה ובעכבר</li>
+                                    <li>✓ כפתורים גדולים לשימוש נוח</li>
+                                    <li>✓ תמיכה בהדפסה מכל המכשירים</li>
                                 </ul>
                             </div>
 
                             <div class="instruction-section">
-                                <h3>נ’¡ ׳˜׳™׳₪׳™׳ ׳׳©׳™׳׳•׳© ׳׳™׳˜׳‘׳™</h3>
+                                <h3>💡 טיפים לשימוש מיטבי</h3>
                                 <ul>
-                                    <li>נ“ ׳”׳©׳×׳׳©׳• ׳‘׳§׳•׳•׳™׳ ׳”׳›׳—׳•׳׳™׳ ׳›׳׳“׳¨׳™׳ ׳׳’׳•׳‘׳” ׳”׳׳•׳×׳™׳•׳×</li>
-                                    <li>נ¨ ׳”׳•׳¡׳™׳₪׳• ׳×׳׳•׳ ׳•׳× ׳”׳§׳©׳•׳¨׳•׳× ׳׳׳™׳׳™׳ ׳©׳׳×׳ ׳‘׳•׳ ׳™׳</li>
-                                    <li>נ’¾ ׳”׳©׳×׳׳©׳• ׳‘׳×׳›׳•׳ ׳× ׳”׳©׳׳™׳¨׳” ׳”׳׳•׳˜׳•׳׳˜׳™׳×</li>
-                                    <li>נ† ׳×׳¨׳’׳׳• ׳‘׳ ׳™׳™׳× ׳׳™׳׳™׳ ׳‘׳׳•׳₪׳ ׳”׳“׳¨׳’׳×׳™</li>
+                                    <li>📝 השתמשו בקווים הכחולים כמדריך לגובה האותיות</li>
+                                    <li>🎨 הוסיפו תמונות הקשורות למילים שאתם בונים</li>
+                                    <li>💾 השתמשו בתכונת השמירה האוטומטית</li>
+                                    <li>🎆 תרגלו בניית מילים באופן הדרגתי</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="instructions-footer">
-                            <button onclick="this.parentElement.parentElement.parentElement.remove()" class="close-instructions-btn">׳”׳‘׳ ׳×׳™, ׳‘׳•׳׳• ׳ ׳×׳—׳™׳! נ€</button>
+                            <button onclick="this.parentElement.parentElement.parentElement.remove()" class="close-instructions-btn">הבנתי, בואו נתחיל! 🚀</button>
                         </div>
                     </div>
                 `;
@@ -2129,7 +2135,7 @@
                     const headings = modal.querySelectorAll('.instruction-section h3');
                     headings.forEach(h => {
                         const t = (h.textContent || '').trim();
-                        if (t && t.includes('׳ ׳’׳™׳©')) {
+                        if (t && t.includes('נגיש')) {
                             const sec = h.closest('.instruction-section');
                             if (sec) sec.remove();
                         }
@@ -2138,7 +2144,7 @@
                     const mobileNodes = modal.querySelectorAll('.instructions-body li, .instructions-body p, .instructions-body h3, .instructions-body h4');
                     mobileNodes.forEach(n => {
                         const t = (n.textContent || '').trim();
-                        if (/׳׳•׳‘׳™׳™׳/i.test(t) || /mobile/i.test(t)) {
+                        if (/מובייל/i.test(t) || /mobile/i.test(t)) {
                             n.remove();
                         }
                     });
@@ -2264,7 +2270,7 @@
                             };
                             img.src = this.uploadedImage;
                         } else {
-                            imageDisplay.innerHTML = '<div class="placeholder">׳’׳¨׳•׳¨ ׳×׳׳•׳ ׳” ׳׳›׳׳</div>';
+                            imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
                         }
                     } catch (e) {
                         console.error('Failed to load saved data:', e);
@@ -2281,7 +2287,7 @@
             }
             removeImage() {
                 const imageDisplay = document.getElementById('imageDisplay');
-                imageDisplay.innerHTML = '<div class="placeholder">׳’׳¨׳•׳¨ ׳×׳׳•׳ ׳” ׳׳›׳׳</div>';
+                imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
                 this.uploadedImage = null;
                 this.saveState();
             }
