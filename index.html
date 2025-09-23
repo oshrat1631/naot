@@ -35,7 +35,7 @@
             font-family: var(--tile-font);
             background: var(--bg-color);
             overflow: hidden;
-            touch-action: none;
+            touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -182,6 +182,7 @@
             position: relative;
             overflow: hidden;
             background: var(--bg-color);
+            touch-action: none;
         }
         .board {
             position: absolute;
@@ -948,11 +949,62 @@
                 print-color-adjust: exact !important;
             }
         }
+        /* Mobile drawer/backdrop + responsive adjustments */
+        .menu-toggle { display: none; }
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 150;
+        }
+        .backdrop.backdrop--visible { opacity: 1; pointer-events: auto; }
+
+        @media (max-width: 768px) {
+            :root {
+                /* Slightly tighter bands and gaps for small screens */
+                --band-h: 75px;
+                --red-gap: 20px;
+                --blue-gap: 54px;
+                --period: calc(var(--band-h) + var(--red-gap));
+                --blue-top: calc((var(--band-h) - var(--blue-gap)) / 2);
+                --blue-bottom: calc((var(--band-h) + var(--blue-gap)) / 2);
+            }
+            .app {
+                height: 100svh;
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .content-area {
+                flex-direction: column; /* stack main content; sidebar becomes drawer */
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0; /* drawer opens from the RTL start (left) */
+                right: auto;
+                width: min(85vw, 320px);
+                max-width: 90vw;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 200;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+            }
+            .sidebar.sidebar--open { transform: translateX(0); }
+            .menu-toggle { display: inline-flex; align-items: center; gap: 8px; }
+            .word-display { font-size: clamp(24px, 6vw, 40px); }
+            .toolbar input[type="text"] { width: min(55vw, 220px); }
+            .image-display { max-height: 30vh; }
+        }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="toolbar">
+            <button id="menuToggle" class="menu-toggle" aria-controls="sidebar" aria-expanded="false">תפריט</button>
             <input type="text" id="teacherWord" placeholder="כתוב מילה להעתקה..." />
             <button id="undoBtn" aria-label="ביטול הפעולה האחרונה">↶ ביטול</button>
             <button id="redoBtn" aria-label="ביצוע מחדש של הפעולה האחרונה">↷ חזרה</button>
@@ -1098,7 +1150,7 @@
                 </div>
             </div>
             
-            <div class="sidebar">
+            <div class="sidebar" id="sidebar" aria-hidden="true">
                 <div class="image-display" id="imageDisplay">
                     <div class="placeholder">גרור תמונה לכאן</div>
                     <div class="drop-zone" id="dropZone">שחרר כאן להעלאת תמונה</div>
@@ -2184,6 +2236,38 @@
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             new MontessoriApp();
+
+            // Mobile drawer toggle
+            const menuBtn = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+
+            const openSidebar = () => {
+                if (!sidebar) return;
+                sidebar.classList.add('sidebar--open');
+                sidebar.setAttribute('aria-hidden', 'false');
+                if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
+                if (backdrop) backdrop.classList.add('backdrop--visible');
+            };
+            const closeSidebar = () => {
+                if (!sidebar) return;
+                sidebar.classList.remove('sidebar--open');
+                sidebar.setAttribute('aria-hidden', 'true');
+                if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+                if (backdrop) backdrop.classList.remove('backdrop--visible');
+            };
+            const toggleSidebar = () => {
+                if (!sidebar) return;
+                if (sidebar.classList.contains('sidebar--open')) closeSidebar(); else openSidebar();
+            };
+            if (menuBtn) menuBtn.addEventListener('click', toggleSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+
+            // Close drawer when switching to desktop size
+            const mq = window.matchMedia('(min-width: 769px)');
+            const handleMQ = (e) => { if (e.matches) closeSidebar(); };
+            if (mq.addEventListener) mq.addEventListener('change', handleMQ); else if (mq.addListener) mq.addListener(handleMQ);
         });
         
         // Prevent context menu on right click
@@ -2232,5 +2316,6 @@
             window.addEventListener('afterprint', removePrintClones);
         })();
     </script>
+    <div class="backdrop" id="backdrop"></div>
 </body>
 </html>
