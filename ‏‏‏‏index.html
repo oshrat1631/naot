@@ -1,0 +1,2236 @@
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אותיות נעות מונטסוריות</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Noto+Sans+Hebrew:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --band-h: 95px;        /* גובה רצועת הכתיבה */
+            --red-gap: 25px;       /* מרווח צר בין להקות */
+            --red-anchor: 15px;    /* עוגן אנכי לגריד */
+            --blue-gap: 61px;      /* רוחב רצועת הכחולים */
+            --tile-font: 'Frank Ruhl Libre', 'Noto Sans Hebrew', 'Rubik', sans-serif;
+            --red-color: #d32f2f;
+            --blue-color: #1976d2;
+            --black-color: #333;
+            --band-color: #e3f2fd;
+            --line-color: #f44336;
+            --bg-color: #fff9f0; /* very light cream */
+            /* מחזור תקני לכל הלהקות */
+            --period: calc(var(--band-h) + var(--red-gap));
+            /* מיקום כחולים ביחס למחזור */
+            --blue-top: calc((var(--band-h) - var(--blue-gap)) / 2);
+            --blue-bottom: calc((var(--band-h) + var(--blue-gap)) / 2);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: var(--tile-font);
+            background: var(--bg-color);
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .toolbar {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+            padding: 10px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .toolbar input[type="text"] {
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 16px;
+            width: 220px;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+        .toolbar input[type="text"]:focus {
+            outline: none;
+            border-color: var(--blue-color);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+        .toolbar button {
+            padding: 10px 18px;
+            border: none;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+            color: var(--black-color);
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border: 2px solid #e0e0e0;
+        }
+        .toolbar button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #f5f9ff 0%, #e3f2fd 100%);
+        }
+        .toolbar button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .content-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: row-reverse; /* This moves sidebar to left, main content to right */
+        }
+        .sidebar {
+            width: 280px; /* wider to host grid like the screenshot */
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 12px;
+            flex-shrink: 0;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .image-display {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            aspect-ratio: 16/9;
+        }
+        .image-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .image-display .placeholder {
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+        .upload-btn {
+            padding: 12px 20px;
+            border: none;
+            background: linear-gradient(135deg, var(--blue-color) 0%, #1565c0 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            width: 100%;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+        }
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .word-display {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--red-color);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .board-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+        .board {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color);
+            /* דפוס קבוע לכל הגבהים: שימוש ב-background-size ו-position */
+            background-image:
+                /* אדום: קו עליון ותחתון */
+                linear-gradient(
+                    to bottom,
+                    transparent 0,
+                    transparent 0,
+                    var(--red-color) 0,
+                    var(--red-color) 1px,
+                    transparent 1px,
+                    transparent calc(var(--band-h) - 1px),
+                    var(--red-color) calc(var(--band-h) - 1px),
+                    var(--red-color) calc(var(--band-h)),
+                    transparent calc(var(--band-h))
+                ),
+                /* כחול עליון (טריפלט דק סביב הקו) */
+                linear-gradient(
+                    to bottom,
+                    transparent 0,
+                    transparent calc(var(--blue-top) - 1px),
+                    var(--blue-color) calc(var(--blue-top) - 1px),
+                    var(--blue-color) calc(var(--blue-top)),
+                    transparent calc(var(--blue-top)),
+                    transparent calc(var(--blue-top) + 1px),
+                    var(--blue-color) calc(var(--blue-top) + 1px),
+                    var(--blue-color) calc(var(--blue-top) + 2px),
+                    transparent calc(var(--blue-top) + 2px)
+                ),
+                /* כחול תחתון (טריפלט דק סביב הקו) */
+                linear-gradient(
+                    to bottom,
+                    transparent 0,
+                    transparent calc(var(--blue-bottom) - 1px),
+                    var(--blue-color) calc(var(--blue-bottom) - 1px),
+                    var(--blue-color) calc(var(--blue-bottom)),
+                    transparent calc(var(--blue-bottom)),
+                    transparent calc(var(--blue-bottom) + 1px),
+                    var(--blue-color) calc(var(--blue-bottom) + 1px),
+                    var(--blue-color) calc(var(--blue-bottom) + 2px),
+                    transparent calc(var(--blue-bottom) + 2px)
+                );
+            background-size: 100% var(--period), 100% var(--period), 100% var(--period);
+            background-position: 0 var(--red-anchor), 0 var(--red-anchor), 0 var(--red-anchor);
+            background-repeat: repeat-y, repeat-y, repeat-y;
+        }
+        
+        /* Print margin indicators - visible only on screen */
+        .print-margins {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .print-margin-indicator {
+            position: absolute;
+            border: 2px dashed #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+            pointer-events: none;
+        }
+        
+        .print-margin-left {
+            top: 0;
+            left: 5mm;
+            bottom: 0;
+            width: 5mm;
+            border-right: 2px dashed #ff9800;
+            border-top: none;
+            border-bottom: none;
+            border-left: none;
+            display: none; /* hide left margin indicator */
+        }
+        
+        .print-margin-right {
+            top: 0;
+            right: 35mm; /* nudged ~0.25cm (2.5mm) further left */
+            bottom: 0;
+            width: 5mm;
+            border-left: 2px dashed #ff9800;
+            border-top: none;
+            border-bottom: none;
+            border-right: none;
+        }
+        .tile {
+            position: absolute;
+            cursor: grab;
+            font-family: var(--tile-font);
+            font-weight: 700;
+            font-size: 85px;  /* Increased from 72px to better fill the blue lines */
+            line-height: 0.85;
+            z-index: 10;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            padding: 0;
+            border-radius: 0;
+            transition: transform 0.1s ease;
+            font-feature-settings: "hebr" 1, "hebr" 2;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* Constrain dimensions to letter area only */
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            /* Ensure text doesn't create extra clickable area below */
+            text-align: center;
+        }
+        .tile:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+            z-index: 50;
+        }
+        .tile.red {
+            color: var(--red-color);
+        }
+        .tile.blue {
+            color: var(--blue-color);
+        }
+        /* Increase on-canvas letter size by total ~6pt (exclude punctuation) */
+        .tile.red, .tile.blue {
+            font-size: calc(85px + 6pt);
+        }
+        .tile.black {
+            color: var(--black-color);
+            width: 38px;  /* further narrow side grab area */
+            height: 30px; /* further reduce top/bottom grab area */
+            font-size: calc(85px - 2pt); /* reduce punctuation size by ~2pt on canvas */
+        }
+        .tile.dot {
+            font-size: 48px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            text-align: center;
+            font-weight: 700;
+        }
+        .tile.dot.small {
+            font-size: 36px;
+            width: 32px;
+            height: 32px;
+            line-height: 1;
+            text-align: center;
+            font-weight: 700;
+        }
+        .tile.nikud {
+            font-size: 108px; /* Increased by 1.5x from 72px */
+            color: var(--blue-color);
+            width: 56px;  /* Original size */
+            height: 55px;  /* Original size */
+            display: flex;
+            align-items: center;  /* center horizontally */
+            justify-content: flex-end;  /* anchor content to bottom, minimize area above */
+            padding: 0;
+            line-height: 0.7;
+            text-align: center;
+            font-weight: 500;
+            font-feature-settings: "hebr" 1, "hebr" 2;
+            text-rendering: optimizeLegibility;
+            flex-direction: column;
+            background: transparent;
+            overflow: hidden; /* clip overflow so bottom area isn't clickable */
+            pointer-events: none; /* disable clicks on container; enable on child */
+            transform: scale(1.5); /* Scale the entire element by 1.5x */
+            transform-origin: center;
+        }
+        /* Extra-narrow side grab area specifically for Qubuts */
+        .tile.nikud[data-char="ֻ"] {
+            width: 48px;
+        }
+        /* Extra-narrow side grab area for small marks (segol/tsere/hiriq/sheva) */
+        .tile.nikud[data-char="ֶ"],
+        .tile.nikud[data-char="ֵ"],
+        .tile.nikud[data-char="ִ"],
+        .tile.nikud[data-char="ְ"] {
+            width: 42px;
+        }
+        /* Narrow group for patah/qamats/hataf marks */
+        .tile.nikud[data-char="ַ"],
+        .tile.nikud[data-char="ָ"],
+        .tile.nikud[data-char="ֲ"],
+        .tile.nikud[data-char="ֱ"],
+        .tile.nikud[data-char="ֳ"] {
+            width: 48px;
+        }
+        .tile.nikud img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: auto;  /* only the visible nikud is draggable/clickable */
+            margin-bottom: 9px; /* Increased by 1.5x from 6px */
+        }
+        .tile.nikud svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: auto;
+            margin-bottom: 6px;
+        }
+        .dock {
+            background: linear-gradient(145deg, #D2B48C 0%, #DEB887 25%, #F5DEB3 50%, #DEB887 75%, #D2B48C 100%);
+            border-top: 2px solid #C19A6B;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-height: 180px; /* compress so no internal scroll is needed */
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            flex-shrink: 0;
+            box-shadow: 
+                inset 2px 2px 6px rgba(255,255,255,0.3),
+                inset -2px -2px 6px rgba(0,0,0,0.1),
+                0 -4px 12px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .dock-tile {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: var(--tile-font);
+            font-size: 30px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 100%);
+            transition: all 0.3s ease;
+            min-width: 48px;
+            height: 48px;
+            text-align: center;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            font-feature-settings: "hebr" 1, "hebr" 2;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .dock-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            background: linear-gradient(135deg, #f5f9ff 0%, #e3f2fd 100%);
+        }
+        .dock-tile:active {
+            transform: scale(0.95);
+        }
+        .dock-tile.red {
+            color: var(--red-color);
+            border-color: rgba(211, 47, 47, 0.3);
+        }
+        .dock-tile.blue {
+            color: var(--blue-color);
+            border-color: rgba(25, 118, 210, 0.3);
+        }
+        .dock-tile.black {
+            color: var(--black-color);
+            border-color: rgba(51, 51, 51, 0.3);
+        }
+        .dock-tile.dot {
+            font-size: 34px;
+            min-width: 48px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-align: center;
+            font-weight: 700;
+        }
+        .dock-tile.dot.small {
+            font-size: 32px;
+            min-width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-align: center;
+            font-weight: 700;
+        }
+        .dock-tile.nikud {
+            font-size: 46px;
+            min-width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            line-height: 1;
+            text-align: center;
+            font-weight: 500;
+            font-feature-settings: "hebr" 1, "hebr" 2;
+            text-rendering: optimizeLegibility;
+            background-color: white;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .dock-tile.nikud svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .dock-tile.nikud img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        /* Compact the first dock section (letters) specifically */
+        .dock .dock-section:first-child .dock-section-title { display: none; }
+        .dock .dock-section:first-child .dock-section-content .dock-tile {
+            font-size: 28px;
+            min-width: 44px;
+            height: 44px;
+            padding: 6px 8px;
+        }
+
+        /* Side tray (nikud + punctuation + aids) */
+        .side-dock {
+            flex: 1;
+            background: #e6d0a8; /* light tan like screenshot */
+            border: 1px solid #d1b27f;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.08);
+            overflow: auto;
+        }
+        .side-dock-title {
+            background: linear-gradient(180deg, #e9d7b5, #d5b98e);
+            border: 1px solid #caa873;
+            color: #5a4b2f;
+            font-weight: 700;
+            text-align: center;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .side-dock-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .side-dock-grid .dock-tile {
+            min-width: auto;
+            width: 100%;
+            height: 64px; /* comfortable for tap */
+            font-size: 38px;
+            border-radius: 14px;
+        }
+        .side-dock-grid .dock-tile.nikud img {
+            width: 52px;
+            height: 52px;
+        }
+        
+        /* Make all buttons in side dock the same size */
+        .side-dock-grid .dock-tile.dot,
+        .side-dock-grid .dock-tile.dot.small {
+            height: 64px !important;
+            font-size: 38px !important;
+            min-width: auto !important;
+            width: 100% !important;
+        }
+
+        .dock-section {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .dock-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 12px;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 6px;
+        }
+        /* Print clones for word and image - hidden on screen */
+        .print-word, .print-image {
+            display: none;
+            position: absolute;
+            z-index: 10; /* same layer as tiles */
+            pointer-events: none;
+        }
+        .dock-section-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        /* Force Rubik font only on top toolbar buttons */
+        .toolbar button {
+            font-family: 'Rubik', sans-serif !important;
+        }
+        .trash-bin {
+            position: fixed;
+            bottom: 270px;
+            left: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+        .trash-bin.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+        .trash-bin.hover {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
+        }
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            z-index: 1000;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        .context-menu.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+        .context-menu button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            text-align: right;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+        .context-menu button:hover {
+            background: #f5f5f5;
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #333333 0%, #555555 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .notification.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .file-input {
+            display: none;
+        }
+        .drop-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(25, 118, 210, 0.1);
+            border: 3px dashed #1976d2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #1976d2;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+        }
+        .drop-zone.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .copyright {
+            color: #999;
+            font-size: 10px;
+            text-align: left;
+            pointer-events: none;
+            opacity: 0.7;
+            font-family: var(--tile-font);
+            white-space: nowrap;
+            margin-right: auto;
+            margin-left: 10px;
+        }
+        /* Screen-only tweak: enlarge nikud on canvas and keep punctuation modest */
+        @media screen {
+            .tile.black { font-size: calc(85px - 8pt) !important; }
+            /* Increase nikud size on canvas */
+            .tile.nikud img { width: 100%; height: 100%; }
+        }
+        @media (max-width: 768px) {
+            /* Enhanced mobile touch targets for better accessibility */
+            .toolbar {
+                padding: 12px 16px;  /* Increased padding for easier touch */
+                font-size: 14px;     /* Slightly larger text */
+                gap: 12px;           /* Better spacing between elements */
+            }
+            .toolbar input[type="text"] {
+                width: 160px;        /* Slightly wider for easier typing */
+                font-size: 16px;     /* Larger font for better readability */
+                padding: 8px 12px;   /* Better touch target */
+                min-height: 44px;    /* iOS accessibility guideline */
+            }
+            .toolbar button {
+                min-height: 44px;    /* iOS accessibility guideline for touch targets */
+                min-width: 44px;
+                padding: 8px 16px;   /* Better touch area */
+                font-size: 14px;
+            }
+            .sidebar {
+                width: 160px;        /* Slightly wider for better touch */
+                padding: 16px;       /* More comfortable spacing */
+            }
+            .image-display {
+                height: 130px;       /* Slightly taller for better visibility */
+            }
+            .word-display {
+                font-size: 26px;     /* Larger for better readability */
+                min-height: 60px;    /* More space for text */
+                padding: 8px;
+            }
+            .dock {
+                padding: 12px;       /* Better spacing */
+                gap: 12px;           /* Improved spacing between items */
+                max-height: 240px;   /* Slightly more space */
+            }
+            .dock-tile {
+                font-size: 30px;     /* Larger letters for better visibility */
+                padding: 10px 14px;  /* Better touch area */
+                min-width: 56px;     /* Larger touch target */
+                height: 56px;        /* Better touch target */
+                min-height: 44px;    /* iOS accessibility guideline */
+            }
+            .dock-tile.nikud {
+                padding: 6px;        /* Better touch area for niqqud */
+                min-width: 50px;
+                min-height: 50px;
+            }
+            .dock-tile.nikud img {
+                width: 38px;         /* Slightly larger niqqud images */
+                height: 38px;
+            }
+
+            /* Enhanced canvas tiles for better touch interaction */
+            .tile {
+                font-size: 70px;     /* Slightly larger letters */
+                width: 52px;         /* Larger touch target */
+                height: 52px;
+                line-height: 0.85;
+                min-width: 44px;     /* iOS accessibility guideline */
+                min-height: 44px;
+            }
+            .tile.nikud {
+                font-size: 60px;
+                width: 56px;         /* Original size */
+                height: 55px;
+                line-height: 0.7;
+                align-items: center;
+                min-width: 50px;
+                min-height: 50px;
+                transform: scale(1.5); /* Scale the entire element by 1.5x */
+                transform-origin: center;
+            }
+            .tile.nikud img {
+                width: 100%;
+                height: 100%;
+            }
+            .trash-bin {
+                bottom: 250px;       /* Adjusted for new dock height */
+                width: 70px;         /* Larger touch target */
+                height: 70px;
+                font-size: 28px;     /* Larger icon */
+                min-width: 44px;     /* iOS accessibility guideline */
+                min-height: 44px;
+            }
+            .copyright {
+                font-size: 10px;     /* Slightly larger for readability */
+                bottom: 5px;
+            }
+        }
+        @media print {
+            /* Set page to landscape orientation with minimal margins */
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+            
+            /* Force background images to print */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            html, body {
+                direction: rtl !important;
+                text-align: right !important;
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .toolbar, .dock, .trash-bin, .context-menu, .notification, .sidebar, .print-margins {
+                display: none !important;
+            }
+            .print-image { display: block !important; }
+            
+            .app {
+                height: auto;
+                direction: rtl !important;
+            }
+            
+            .content-area {
+                display: block;
+                direction: rtl !important;
+            }
+            
+            .main-content {
+                display: block;
+                direction: rtl !important;
+            }
+            
+            .board-container {
+                /* Reserve space for header area to avoid second blank page */
+                height: calc(100vh - 15mm) !important; /* Further reduced height to prevent overflow */
+                max-height: calc(100vh - 15mm) !important;
+                position: relative;
+                overflow: visible;
+                background: transparent !important;
+                direction: rtl !important;
+                text-align: right !important;
+                /* No extra padding so we use full page width minus @page margins */
+                padding: 0 !important;
+            }
+            
+            .board {
+                position: static;
+                transform: none !important;
+                width: 100%;
+                height: 100% !important;
+                max-height: calc(100vh - 30mm) !important; /* Reduced height to prevent overflow */
+                /* Minimal inner padding to avoid edge clipping only */
+                padding: 0 5mm !important;
+                box-sizing: border-box !important;
+                direction: rtl !important;
+                /* Blue lines only for print */
+                background-color: var(--bg-color) !important;
+                background-image: 
+                    /* Blue helper lines - 14% position with thicker 3px band */
+                    repeating-linear-gradient(
+                        to bottom,
+                        transparent 0,
+                        transparent calc(15px + var(--band-h) * 0.14 - 1.5px),
+                        #1976d2 calc(15px + var(--band-h) * 0.14 - 1.5px),
+                        #1976d2 calc(15px + var(--band-h) * 0.14 + 1.5px),
+                        transparent calc(15px + var(--band-h) * 0.14 + 1.5px),
+                        transparent calc(var(--band-h) + 30px)
+                    ),
+                    /* Blue helper lines - 86% position with thicker 3px band */
+                    repeating-linear-gradient(
+                        to bottom,
+                        transparent 0,
+                        transparent calc(15px + var(--band-h) * 0.86 - 1.5px),
+                        #1976d2 calc(15px + var(--band-h) * 0.86 - 1.5px),
+                        #1976d2 calc(15px + var(--band-h) * 0.86 + 1.5px),
+                        transparent calc(15px + var(--band-h) * 0.86 + 1.5px),
+                        transparent calc(var(--band-h) + 30px)
+                    ) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            /* Enlarge header and ensure it consumes predictable space */
+            .word-display {
+                display: block !important;
+                font-size: 14mm !important; /* much larger in print */
+                min-height: 15mm !important; /* Reduced height to prevent overflow */
+                padding: 0 10mm !important;
+            }
+            
+            .tile {
+                position: absolute;
+                transform: translateY(calc(var(--band-h) * 0.27)) !important; /* push letters further downward toward lower blue line proportionally */
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                overflow: visible !important; /* Ensure letters at edges are not cut off */
+                box-sizing: content-box !important; /* Ensure proper sizing */
+                margin: 0 1mm !important; /* Tiny buffer to prevent edge clipping */
+            }
+            /* Increase letter font size by ~2pt in print only */
+            .tile.red, .tile.blue {
+                font-size: calc(85px + 2pt) !important;
+            }
+            .tile.nikud {
+                /* raise nikud a further 2mm on print */
+                transform: translate(-2mm, calc(var(--band-h) * 0.12 - 2mm)) !important;
+            }
+            /* Raise punctuation slightly by 2mm in print */
+            .tile.black {
+                transform: translateY(calc(var(--band-h) * 0.27 - 2mm)) !important;
+            }
+            /* Restore previous rule (no special transform for punctuation beyond .tile) */
+            
+            .copyright {
+                display: block !important;
+                position: fixed;
+                bottom: 10mm;
+                left: 50%;
+                transform: translateX(-50%);
+                color: #666;
+                font-size: 12px;
+                text-align: center;
+                opacity: 1;
+                pointer-events: none;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="toolbar">
+            <input type="text" id="teacherWord" placeholder="כתוב מילה להעתקה..." />
+            <button id="undoBtn" aria-label="ביטול הפעולה האחרונה">↶ ביטול</button>
+            <button id="redoBtn" aria-label="ביצוע מחדש של הפעולה האחרונה">↷ חזרה</button>
+            <button id="clearBtn">נקה הכל</button>
+            <button id="clearNikudBtn">נקה ניקוד</button>
+            <button id="printBtn">🖨️ הדפס</button>
+            <button id="instructionsBtn">📖 הוראות</button>
+            <button id="removeImageBtn">🗑️ הסר תמונה</button>
+            <div class="copyright">כל הזכויות שמורות לאושרת רון</div>
+        </div>
+        
+        <div class="content-area">
+            <div class="main-content">
+                <div class="word-display" id="wordDisplay"></div>
+                <div class="board-container">
+                    <div class="board" id="board">
+                        <!-- Print margin indicators -->
+                        <div class="print-margins">
+                            <div class="print-margin-indicator print-margin-left"></div>
+                            <div class="print-margin-indicator print-margin-right"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dock" id="dock">
+                    <!-- Hebrew letters section -->
+                    <div class="dock-section">
+                        <div class="dock-section-title">אותיות עברית</div>
+                        <div class="dock-section-content">
+                            <div class="dock-tile red" data-char="א">א</div>
+                            <div class="dock-tile red" data-char="ב">ב</div>
+                            <div class="dock-tile red" data-char="ג">ג</div>
+                            <div class="dock-tile red" data-char="ד">ד</div>
+                            <div class="dock-tile red" data-char="ה">ה</div>
+                            <div class="dock-tile red" data-char="ו">ו</div>
+                            <div class="dock-tile red" data-char="ז">ז</div>
+                            <div class="dock-tile red" data-char="ח">ח</div>
+                            <div class="dock-tile red" data-char="ט">ט</div>
+                            <div class="dock-tile red" data-char="י">י</div>
+                            <div class="dock-tile red" data-char="כ">כ</div>
+                            <div class="dock-tile red" data-char="ל">ל</div>
+                            <div class="dock-tile red" data-char="מ">מ</div>
+                            <div class="dock-tile red" data-char="נ">נ</div>
+                            <div class="dock-tile red" data-char="ס">ס</div>
+                            <div class="dock-tile red" data-char="ע">ע</div>
+                            <div class="dock-tile red" data-char="פ">פ</div>
+                            <div class="dock-tile red" data-char="צ">צ</div>
+                            <div class="dock-tile red" data-char="ק">ק</div>
+                            <div class="dock-tile red" data-char="ר">ר</div>
+                            <div class="dock-tile red" data-char="ש">ש</div>
+                            <div class="dock-tile red" data-char="ת">ת</div>
+                            
+                            <!-- Final letters -->
+                            <div class="dock-tile red" data-char="ך">ך</div>
+                            <div class="dock-tile red" data-char="ם">ם</div>
+                            <div class="dock-tile red" data-char="ן">ן</div>
+                            <div class="dock-tile red" data-char="ף">ף</div>
+                            <div class="dock-tile red" data-char="ץ">ץ</div>
+                            
+                            <!-- Dagesh letters -->
+                            <div class="dock-tile red" data-char="בּ">בּ</div>
+                            <div class="dock-tile red" data-char="כּ">כּ</div>
+                            <div class="dock-tile red" data-char="פּ">פּ</div>
+                            <div class="dock-tile red" data-char="שׁ">שׁ</div>
+                            <div class="dock-tile red" data-char="שׂ">שׂ</div>
+                        </div>
+                    </div>
+                    <!-- Nikud section -->
+                    <div class="dock-section">
+                        <div class="dock-section-title">סימני ניקוד</div>
+                        <div class="dock-section-content">
+                            <div class="dock-tile blue nikud" data-char="ַ">
+                                <img src="images/patah.png" alt="Patah">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ָ">
+                                <img src="images/qamats.png" alt="Qamats">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ֶ">
+                                <img src="images/segol.png" alt="Segol">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ֵ">
+                                <img src="images/tsere.png" alt="Tsere">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ִ">
+                                <img src="images/hiriq.png" alt="Hiriq">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ֻ">
+                                <img src="images/qubuts.png" alt="Qubuts">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ְ">
+                                <img src="images/sheva.png" alt="Sheva">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ֲ">
+                                <img src="images/hataf-patah.png" alt="Hataf Patah">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ֱ">
+                                <img src="images/hataf-segol.png" alt="Hataf Segol">
+                            </div>
+                            <div class="dock-tile blue nikud" data-char="ֳ">
+                                <img src="images/hataf-qamats.png" alt="Hataf Qamats">
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- Reading aids section -->
+                    <div class="dock-section">
+                        <div class="dock-section-title">עזרי קריאה</div>
+                        <div class="dock-section-content">
+                            <div class="dock-tile blue dot" data-char="●">●</div>
+                            <div class="dock-tile blue dot small" data-char="◦">◦</div>
+                            <div class="dock-tile blue" data-char="א">א</div>
+                            <div class="dock-tile blue" data-char="ה">ה</div>
+                            <div class="dock-tile blue" data-char="וֹ">וֹ</div>
+                            <div class="dock-tile blue" data-char="וּ">וּ</div>
+                            <div class="dock-tile blue" data-char="י">י</div>
+                        </div>
+                    </div>
+                    <!-- Punctuation section -->
+                    <div class="dock-section">
+                        <div class="dock-section-title">סימני פיסוק</div>
+                        <div class="dock-section-content">
+                            <div class="dock-tile black" data-char=".">.</div>
+                            <div class="dock-tile black" data-char=",">,</div>
+                            <div class="dock-tile black" data-char=";">;</div>
+                            <div class="dock-tile black" data-char=":">:</div>
+                            <div class="dock-tile black" data-char="?">?</div>
+                            <div class="dock-tile black" data-char="!">!</div>
+                            <div class="dock-tile black" data-char="״">״</div>
+                            <div class="dock-tile black" data-char="׳">׳</div>
+                            <div class="dock-tile black" data-char="…">…</div>
+                            <div class="dock-tile black" data-char="(">(</div>
+                            <div class="dock-tile black" data-char=")">)</div>
+                            <div class="dock-tile black" data-char="[">[</div>
+                            <div class="dock-tile black" data-char="]">]</div>
+                            <div class="dock-tile black" data-char="{">{</div>
+                            <div class="dock-tile black" data-char="}">}</div>
+                            <div class="dock-tile black" data-char="-">-</div>
+                            <div class="dock-tile black" data-char="/">/</div>
+                            <div class="dock-tile black" data-char='"'>"</div>
+                            <div class="dock-tile black" data-char="'">'</div>
+                            <div class="dock-tile black" data-char="•">•</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="image-display" id="imageDisplay">
+                    <div class="placeholder">גרור תמונה לכאן</div>
+                    <div class="drop-zone" id="dropZone">שחרר כאן להעלאת תמונה</div>
+                </div>
+                <button class="upload-btn" id="uploadImageBtn">העלה תמונה</button>
+                <input type="file" id="imageInput" class="file-input" accept="image/*" />
+            </div>
+        </div>
+        
+        <div class="trash-bin" id="trashBin">🗑️</div>
+        
+        <div class="context-menu" id="contextMenu">
+            <button id="duplicateBtn">שכפל</button>
+        </div>
+    
+    </div>
+    <script>
+        /*
+        ================================================================
+        אזהרת זכויות יוצרים
+        ================================================================
+        כל הזכויות שמורות לאושרת רון.
+        אין לעשות שימוש בקוד זה בלי רשות מפורשת.
+        ================================================================
+        */
+        
+        class MontessoriApp {
+            constructor() {
+                this.tiles = [];
+                this.history = [];
+                this.historyIndex = -1;
+                this.draggedTile = null;
+                this.isDragging = false;
+                this.uploadedImage = null;
+                this.bandHeight = 55;
+                this.letterMetrics = null; // Will be set by calculateBandHeight
+                
+                this.init();
+            }
+            init() {
+                this.setupEventListeners();
+                this.buildSideDock();
+                this.calculateBandHeight();
+                this.loadFromStorage();
+                this.saveState();
+            }
+            buildSideDock() {
+                const sidebar = document.querySelector('.sidebar');
+                const dock = document.getElementById('dock');
+                if (!sidebar || !dock) return;
+                // Create side tray
+                const tray = document.createElement('div');
+                tray.className = 'side-dock';
+                const title = document.createElement('div');
+                title.className = 'side-dock-title';
+                title.textContent = 'סימני ניקוד וסימני פיסוק';
+                const grid = document.createElement('div');
+                grid.className = 'side-dock-grid';
+                tray.appendChild(title);
+                tray.appendChild(grid);
+                sidebar.appendChild(tray);
+                // Move all tiles from sections after the first into the side grid
+                const sections = dock.querySelectorAll('.dock-section');
+                sections.forEach((section, idx) => {
+                    if (idx === 0) return; // keep letters at bottom
+                    const tiles = section.querySelectorAll('.dock-tile');
+                    tiles.forEach(t => grid.appendChild(t));
+                    // remove leftover section shell
+                    section.remove();
+                });
+            }
+            calculateBandHeight() {
+                // Create temporary element to measure Hebrew letter height more accurately
+                const temp = document.createElement('div');
+                temp.style.font = '85px var(--tile-font)';  /* Updated to match new font size */
+                temp.style.position = 'absolute';
+                temp.style.visibility = 'hidden';
+                temp.style.fontWeight = '700';
+                temp.style.lineHeight = '1';
+                temp.style.whiteSpace = 'nowrap';
+                
+                // Test with letters that represent the full height range of Hebrew letters
+                // Including tall letters (ל, ק, ף, ץ) and letters with descenders
+                temp.textContent = 'לקףץבכס';
+                document.body.appendChild(temp);
+                
+                // Measure both height and ascender/descender info
+                const fullHeight = temp.offsetHeight;
+                const textMetrics = this.getTextMetrics('לקףץבכס', '85px var(--tile-font)');
+                
+                document.body.removeChild(temp);
+                
+                // Calculate optimal band height based on letter proportions
+                // Hebrew letters typically need about 85% of the full measured height for the main body
+                this.bandHeight = Math.ceil(fullHeight * 0.85);
+                
+                // Ensure minimum practical height
+                if (this.bandHeight < 50) {
+                    this.bandHeight = 50;
+                }
+                
+                // Set band height to match letter height exactly
+                document.documentElement.style.setProperty('--band-h', `${this.bandHeight}px`);
+                
+                // Store additional measurements for better line positioning
+                this.letterMetrics = {
+                    fullHeight: fullHeight,
+                    bandHeight: this.bandHeight,
+                    ascentRatio: 0.75, // Typical Hebrew letter ascent ratio
+                    descentRatio: 0.25  // Space for descenders and nikud
+                };
+            }
+            
+            getTextMetrics(text, font) {
+                // Helper method to get accurate text measurements
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.font = font;
+                return ctx.measureText(text);
+            }
+            setupEventListeners() {
+                // Teacher word input
+                document.getElementById('teacherWord').addEventListener('input', (e) => {
+                    document.getElementById('wordDisplay').textContent = e.target.value;
+                });
+                
+                // Image upload
+                document.getElementById('uploadImageBtn').addEventListener('click', () => {
+                    document.getElementById('imageInput').click();
+                });
+                
+                document.getElementById('imageInput').addEventListener('change', (e) => {
+                    this.handleImageUpload(e.target.files[0]);
+                });
+                
+                // Drag and drop for images
+                const imageDisplay = document.getElementById('imageDisplay');
+                const dropZone = document.getElementById('dropZone');
+                
+                imageDisplay.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('active');
+                });
+                
+                imageDisplay.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('active');
+                });
+                
+                imageDisplay.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('active');
+                    
+                    if (e.dataTransfer.files.length > 0) {
+                        this.handleImageUpload(e.dataTransfer.files[0]);
+                    }
+                });
+                
+                // Toolbar buttons
+                document.getElementById('undoBtn').addEventListener('click', () => this.undo());
+                document.getElementById('redoBtn').addEventListener('click', () => this.redo());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
+                document.getElementById('clearNikudBtn').addEventListener('click', () => this.clearNikud());
+                document.getElementById('printBtn').addEventListener('click', () => this.printToPDF());
+                document.getElementById('instructionsBtn').addEventListener('click', () => this.showInstructions());
+                document.getElementById('removeImageBtn').addEventListener('click', () => this.removeImage());
+                
+                // Dock tiles (work from any location: bottom dock or side tray)
+                document.addEventListener('click', (e) => {
+                    const dockTile = e.target.closest('.dock-tile');
+                    if (dockTile) {
+                        const char = dockTile.dataset.char || dockTile.textContent;
+                        const className = dockTile.className;
+                        this.createTile(char, className);
+                    }
+                });
+                
+                // Board interactions - only drag and drop, no zoom/pan
+                const board = document.getElementById('board');
+                
+                // Mouse events
+                board.addEventListener('mousedown', (e) => this.handlePointerDown(e));
+                document.addEventListener('mousemove', (e) => this.handlePointerMove(e));
+                document.addEventListener('mouseup', (e) => this.handlePointerUp(e));
+                
+                // Touch events
+                board.addEventListener('touchstart', (e) => this.handlePointerDown(e), { passive: false });
+                document.addEventListener('touchmove', (e) => this.handlePointerMove(e), { passive: false });
+                document.addEventListener('touchend', (e) => this.handlePointerUp(e));
+                
+                // Keyboard
+                document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+                
+                // Context menu
+                document.addEventListener('click', (e) => {
+                    if (!document.getElementById('contextMenu').contains(e.target)) {
+                        this.hideContextMenu();
+                    }
+                });
+                document.getElementById('duplicateBtn').addEventListener('click', () => {
+                    if (this.contextMenuTarget) {
+                        this.duplicateTile(this.contextMenuTarget);
+                        this.hideContextMenu();
+                    }
+                });
+                
+                // Storage
+                window.addEventListener('beforeunload', () => this.saveToStorage());
+            }
+            handleImageUpload(file) {
+                if (!file || !file.type.startsWith('image/')) {
+                    this.showNotification('אנא בחר קובץ תמונה תקין');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageDisplay = document.getElementById('imageDisplay');
+                    const img = new Image();
+                    img.onload = () => {
+                        // Calculate aspect ratio and adjust container
+                        const aspectRatio = img.width / img.height;
+                        const container = imageDisplay;
+                        
+                        // Remove any existing image and placeholder
+                        const existingImg = container.querySelector('img');
+                        if (existingImg) {
+                            existingImg.remove();
+                        }
+                        const placeholder = container.querySelector('.placeholder');
+                        if (placeholder) {
+                            placeholder.remove();
+                        }
+                        
+                        // Create new image element
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.alt = 'Uploaded image';
+                        
+                        // Set container aspect ratio based on image
+                        if (aspectRatio > 1) {
+                            // Landscape
+                            container.style.aspectRatio = '16/9';
+                        } else if (aspectRatio < 1) {
+                            // Portrait
+                            container.style.aspectRatio = '9/16';
+                        } else {
+                            // Square
+                            container.style.aspectRatio = '1/1';
+                        }
+                        
+                        container.appendChild(newImg);
+                        this.uploadedImage = e.target.result;
+                        this.saveState();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+            getPointerPos(e) {
+                const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                
+                const boardRect = document.getElementById('board').getBoundingClientRect();
+                return {
+                    x: clientX - boardRect.left,
+                    y: clientY - boardRect.top
+                };
+            }
+            handlePointerDown(e) {
+                e.preventDefault();
+                
+                const target = e.target.closest('.tile');
+                if (!target) return;
+                
+                this.draggedTile = target;
+                this.isDragging = false;
+                
+                const pos = this.getPointerPos(e);
+                this.dragOffset = {
+                    x: pos.x - parseFloat(target.style.left || 0),
+                    y: pos.y - parseFloat(target.style.top || 0)
+                };
+                
+                // Long press for mobile context menu
+                if (e.type === 'touchstart') {
+                    this.longPressTimer = setTimeout(() => {
+                        if (!this.isDragging) {
+                            this.showContextMenu(e, target);
+                        }
+                    }, 500);
+                }
+                
+                // Right click for desktop context menu
+                if (e.button === 2) {
+                    e.preventDefault();
+                    this.showContextMenu(e, target);
+                    return;
+                }
+                
+                target.style.zIndex = '50';
+            }
+            handlePointerMove(e) {
+                e.preventDefault();
+                
+                if (!this.draggedTile) return;
+                
+                if (!this.isDragging) {
+                    this.isDragging = true;
+                    if (this.longPressTimer) {
+                        clearTimeout(this.longPressTimer);
+                        this.longPressTimer = null;
+                    }
+                    this.showTrashBin();
+                }
+                
+                const pos = this.getPointerPos(e);
+                let x = pos.x - this.dragOffset.x;
+                let y = pos.y - this.dragOffset.y;
+                
+                this.draggedTile.style.left = x + 'px';
+                this.draggedTile.style.top = y + 'px';
+                
+                // Check trash bin hover
+                this.checkTrashBinHover(e);
+            }
+            handlePointerUp(e) {
+                if (this.longPressTimer) {
+                    clearTimeout(this.longPressTimer);
+                    this.longPressTimer = null;
+                }
+                
+                if (!this.draggedTile) return;
+                
+                if (this.isDragging) {
+                    // Check if dropped on trash bin
+                    if (this.isOverTrashBin(e)) {
+                        this.deleteTile(this.draggedTile);
+                    } else {
+                        this.saveState();
+                    }
+                    this.hideTrashBin();
+                }
+                
+                this.draggedTile.style.zIndex = '10';
+                this.draggedTile = null;
+                this.isDragging = false;
+            }
+            handleKeyDown(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === 'z' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.undo();
+                    } else if (e.key === 'z' && e.shiftKey || e.key === 'y') {
+                        e.preventDefault();
+                        this.redo();
+                    }
+                }
+                
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    // Delete selected tile (would need selection system)
+                }
+            }
+            getNikudImagePath(char) {
+                // Map niqqud characters to their corresponding image files
+                const nikudMap = {
+                    'ַ': 'images/patah.png',      // Patah
+                    'ָ': 'images/qamats.png',     // Qamats
+                    'ֶ': 'images/segol.png',      // Segol
+                    'ֵ': 'images/tsere.png',      // Tsere
+                    'ִ': 'images/hiriq.png',      // Hiriq
+                    'ֻ': 'images/qubuts.png',     // Qubuts
+                    'ְ': 'images/sheva.png',      // Sheva
+                    'ֲ': 'images/hataf-patah.png', // Hataf Patah
+                    'ֱ': 'images/hataf-segol.png', // Hataf Segol
+                    'ֳ': 'images/hataf-qamats.png' // Hataf Qamats
+                };
+                return nikudMap[char] || null;
+            }
+            createTile(char, className) {
+                const tile = document.createElement('div');
+                tile.className = 'tile ' + className.replace('dock-tile', '').trim();
+                
+                // Check if it's a nikud character
+                if (className.includes('nikud')) {
+                    // Use image for nikud instead of text
+                    const imagePath = this.getNikudImagePath(char);
+                    if (imagePath) {
+                        const img = document.createElement('img');
+                        img.src = imagePath;
+                        img.alt = char;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'contain';
+                        tile.appendChild(img);
+                        // Store the character for saving purposes
+                        tile.dataset.char = char;
+                    } else {
+                        // Fallback to text if image not found
+                        tile.textContent = char;
+                    }
+                } else {
+                    tile.textContent = char;
+                }
+                
+                // Position tile on improved baseline system
+                // Calculate proper baseline position based on letter metrics
+                const baselineOffset = this.calculateBaselinePosition();
+                
+                // Add some randomization to initial horizontal position
+                const randomX = Math.random() * 300 + 100;
+                
+                tile.style.left = randomX + 'px';
+                tile.style.top = baselineOffset + 'px';
+                
+                if (tile.classList.contains('dot')) {
+                    this.applyDotSize(tile);
+                }
+                
+                document.getElementById('board').appendChild(tile);
+                this.tiles.push(tile);
+                this.saveState();
+            }
+            
+            calculateBaselinePosition() {
+                // Calculate the optimal baseline position for Hebrew letters
+                // Based on the new thin line structure where letters sit properly on the blue lines
+                
+                // Shift baseline so letters sit exactly inside the band, hugging lower blue line
+                const firstLinePosition = 15; // keep anchor
+                
+                // Calculate where the letter baseline should be relative to the blue line
+                // Reduce descent so baseline drops toward lower blue line
+                const letterDescentSpace = this.bandHeight * 0.08;
+                
+                // Position the letter so its baseline aligns with the blue line
+                // accounting for the letter's natural descent
+                return firstLinePosition + this.bandHeight - letterDescentSpace;
+            }
+            duplicateTile(tile) {
+                const newTile = tile.cloneNode(true);
+                newTile.style.left = (parseFloat(tile.style.left) + 20) + 'px';
+                newTile.style.top = tile.style.top;
+                
+                document.getElementById('board').appendChild(newTile);
+                this.tiles.push(newTile);
+                this.saveState();
+            }
+            deleteTile(tile) {
+                tile.remove();
+                this.tiles = this.tiles.filter(t => t !== tile);
+                this.saveState();
+            }
+            showContextMenu(e, tile) {
+                const menu = document.getElementById('contextMenu');
+                this.contextMenuTarget = tile;
+                
+                const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                
+                menu.style.left = clientX + 'px';
+                menu.style.top = clientY + 'px';
+                menu.classList.add('visible');
+                this.contextMenuVisible = true;
+            }
+            hideContextMenu() {
+                document.getElementById('contextMenu').classList.remove('visible');
+                this.contextMenuVisible = false;
+                this.contextMenuTarget = null;
+            }
+            showTrashBin() {
+                document.getElementById('trashBin').classList.add('visible');
+            }
+            hideTrashBin() {
+                const trashBin = document.getElementById('trashBin');
+                trashBin.classList.remove('visible', 'hover');
+            }
+            checkTrashBinHover(e) {
+                const trashBin = document.getElementById('trashBin');
+                if (this.isOverTrashBin(e)) {
+                    trashBin.classList.add('hover');
+                } else {
+                    trashBin.classList.remove('hover');
+                }
+            }
+            isOverTrashBin(e) {
+                const trashBin = document.getElementById('trashBin');
+                const rect = trashBin.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                
+                return clientX >= rect.left && clientX <= rect.right &&
+                       clientY >= rect.top && clientY <= rect.bottom;
+            }
+            saveState() {
+                const state = {
+                    tiles: this.tiles.map(tile => {
+                        // Handle nikud tiles with images
+                        if (tile.classList.contains('nikud')) {
+                            return {
+                                char: tile.dataset.char || tile.textContent,
+                                className: tile.className,
+                                left: tile.style.left,
+                                top: tile.style.top,
+                                isNikud: true
+                            };
+                        } else {
+                            return {
+                                char: tile.textContent,
+                                className: tile.className,
+                                left: tile.style.left,
+                                top: tile.style.top,
+                                isNikud: false
+                            };
+                        }
+                    }),
+                    teacherWord: document.getElementById('teacherWord').value,
+                    uploadedImage: this.uploadedImage,
+                    bandHeight: this.bandHeight
+                };
+                this.history = this.history.slice(0, this.historyIndex + 1);
+                this.history.push(JSON.stringify(state));
+                this.historyIndex++;
+                if (this.history.length > 30) {
+                    this.history.shift();
+                    this.historyIndex--;
+                }
+            }
+            undo() {
+                if (this.historyIndex > 0) {
+                    this.historyIndex--;
+                    this.restoreState(JSON.parse(this.history[this.historyIndex]));
+                }
+            }
+            redo() {
+                if (this.historyIndex < this.history.length - 1) {
+                    this.historyIndex++;
+                    this.restoreState(JSON.parse(this.history[this.historyIndex]));
+                }
+            }
+            restoreState(state) {
+                // Clear existing tiles
+                this.tiles.forEach(tile => tile.remove());
+                this.tiles = [];
+                
+                // Restore tiles
+                state.tiles.forEach(tileData => {
+                    const tile = document.createElement('div');
+                    tile.className = tileData.className;
+                    tile.style.left = tileData.left;
+                    tile.style.top = tileData.top;
+                    
+                    // Handle nikud tiles
+                    if (tileData.isNikud) {
+                        // Use image for nikud
+                        const imagePath = this.getNikudImagePath(tileData.char);
+                        if (imagePath) {
+                            const img = document.createElement('img');
+                            img.src = imagePath;
+                            img.alt = tileData.char;
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'contain';
+                            tile.appendChild(img);
+                            tile.dataset.char = tileData.char;
+                        } else {
+                            tile.textContent = tileData.char;
+                        }
+                    } else {
+                        tile.textContent = tileData.char;
+                    }
+                    
+                    if (tile.classList.contains('dot')) {
+                        this.applyDotSize(tile);
+                    }
+                    
+                    document.getElementById('board').appendChild(tile);
+                    this.tiles.push(tile);
+                });
+                
+                // Restore band height
+                this.bandHeight = state.bandHeight || 55;
+                document.documentElement.style.setProperty('--band-h', `${this.bandHeight}px`);
+                
+                // Restore teacher word
+                document.getElementById('teacherWord').value = state.teacherWord || '';
+                document.getElementById('wordDisplay').textContent = state.teacherWord || '';
+                
+                // Restore uploaded image
+                this.uploadedImage = state.uploadedImage || null;
+                const imageDisplay = document.getElementById('imageDisplay');
+                if (this.uploadedImage) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const aspectRatio = img.width / img.height;
+                        const container = imageDisplay;
+                        
+                        // Set container aspect ratio based on image
+                        if (aspectRatio > 1) {
+                            container.style.aspectRatio = '16/9';
+                        } else if (aspectRatio < 1) {
+                            container.style.aspectRatio = '9/16';
+                        } else {
+                            container.style.aspectRatio = '1/1';
+                        }
+                        
+                        container.innerHTML = `<img src="${this.uploadedImage}" alt="Uploaded image">`;
+                    };
+                    img.src = this.uploadedImage;
+                } else {
+                    imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
+                }
+            }
+            clearAll() {
+                if (this.tiles.length === 0) {
+                    this.showNotification('הלוח כבר ריק!');
+                    return;
+                }
+                
+                if (confirm('האם אתה בטוח שברצונך לנקות את כל הלוח?')) {
+                    // Clear all tiles from DOM
+                    this.tiles.forEach(tile => {
+                        if (tile && tile.parentNode) {
+                            tile.parentNode.removeChild(tile);
+                        }
+                    });
+                    
+                    // Clear tiles array
+                    this.tiles = [];
+                    
+                    // Save the cleared state
+                    this.saveState();
+                    this.showNotification('הלוח נוקה בהצלחה');
+                }
+            }
+            clearNikud() {
+                // Find all nikud tiles
+                const nikudTiles = this.tiles.filter(tile => tile.classList.contains('nikud'));
+                
+                if (nikudTiles.length === 0) {
+                    this.showNotification('אין סימני ניקוד להסרה!');
+                    return;
+                }
+                
+                if (confirm('האם אתה בטוח שברצונך למחוק את כל סימני הניקוד?')) {
+                    // Remove nikud tiles from DOM
+                    nikudTiles.forEach(tile => {
+                        if (tile && tile.parentNode) {
+                            tile.parentNode.removeChild(tile);
+                        }
+                    });
+                    
+                    // Remove nikud tiles from tiles array
+                    this.tiles = this.tiles.filter(tile => !tile.classList.contains('nikud'));
+                    
+                    // Save the cleared state
+                    this.saveState();
+                    this.showNotification(`נמחקו ${nikudTiles.length} סימני ניקוד`);
+                }
+            }
+            createPrintLines() {
+                const board = document.getElementById('board');
+                if (!board) return;
+                const existing = board.querySelector('.print-lines');
+                if (existing) existing.remove();
+                const linesContainer = document.createElement('div');
+                linesContainer.className = 'print-lines';
+                linesContainer.style.position = 'absolute';
+                linesContainer.style.top = '0';
+                linesContainer.style.left = '0';
+                linesContainer.style.right = '0';
+                linesContainer.style.bottom = '0';
+                linesContainer.style.pointerEvents = 'none';
+                linesContainer.style.zIndex = '1';
+                const boardHeight = board.offsetHeight;
+                const bandVar = getComputedStyle(document.documentElement).getPropertyValue('--band-h');
+                const lineHeight = parseInt(bandVar) || 55;
+                const lineSpacing = lineHeight + 30;
+                const numLines = Math.ceil(boardHeight / lineSpacing);
+                for (let i = 0; i < numLines; i++) {
+                    const lineY = 15 + i * lineSpacing;
+                    const mk = (y, color) => {
+                        const d = document.createElement('div');
+                        d.style.position = 'absolute';
+                        d.style.top = y + 'px';
+                        d.style.left = '0';
+                        d.style.right = '0';
+                        d.style.height = '1px';
+                        d.style.backgroundColor = color;
+                        return d;
+                    };
+                    linesContainer.appendChild(mk(lineY, '#d32f2f'));
+                    linesContainer.appendChild(mk(lineY + lineHeight, '#d32f2f'));
+                    linesContainer.appendChild(mk(lineY + lineHeight * 0.25, '#1976d2'));
+                    linesContainer.appendChild(mk(lineY + lineHeight * 0.75, '#1976d2'));
+                }
+                board.appendChild(linesContainer);
+                const style = document.createElement('style');
+                style.textContent = `@media screen{.print-lines{display:none!important}}@media print{.print-lines{display:block!important}}`;
+                document.head.appendChild(style);
+            }
+
+            printToPDF() {
+                window.print();
+            }
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('visible');
+                }, 10);
+                
+                setTimeout(() => {
+                    notification.classList.remove('visible');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 2000);
+            }
+            showInstructions() {
+                const modal = document.createElement('div');
+                modal.className = 'instructions-modal';
+                modal.innerHTML = `
+                    <div class="instructions-content">
+                        <div class="instructions-header">
+                            <h2>📖 הוראות שימוש - אותיות נעות מונטסורי</h2>
+                            <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+                        </div>
+                        <div class="instructions-body">
+                            <div class="instruction-section">
+                                <h3>🎓 אותיות נעות בגישה המונטסורית</h3>
+                                <ul>
+                                    <li>גישת מונטסורי מדגישה לימוד חושי-מוטורי של קריאה וכתיבה</li>
+                                    <li>האותיות הנעות מאפשרות לילדים לבנות מילים באופן פיזי וחושי</li>
+                                    <li>הגישה מעודדת לימוד עצמאי ולימוד בקצב האישי של הילד</li>
+                                    <li>יישום דיגיטלי זה מביא את החוויה המונטסורית למסך</li>
+                                </ul>
+                            </div>
+
+                            <div class="instruction-section">
+                                <h3>🖱️ איך להשתמש באפליקציה</h3>
+                                <ul>
+                                    <li><strong>גרירת אותיות:</strong> לחצו על אות במחסן האותיות וגררו אותה ללוח</li>
+                                    <li><strong>הוספת ניקוד:</strong> גררו סימני ניקוד מתחת לאותיות</li>
+                                    <li><strong>העלאת תמונות:</strong> גררו תמונה לאזור הימני או לחצו על 'העלה תמונה'</li>
+                                    <li><strong>כתיבת מילים:</strong> הקלידו מילה בתיבת הטקסט העליונה כדי להציגה</li>
+                                    <li><strong>מחיקת אותיות:</strong> גררו אותיות או סימני ניקוד לפח האשפה כדי למחוק אותם</li>
+                                </ul>
+                            </div>
+
+                            <div class="instruction-section copyright-section">
+                                <h3>© זכויות יוצרים ושימוש</h3>
+                                <ul>
+                                    <li><strong>כל הזכויות שמורות לאושרת רון</strong></li>
+                                    <li>השימוש ביישומון מותר רק בהסכמת המפתחת</li>
+                                    <li>אין להעתיק, לשנות או להפיץ את היישומון ללא רשות מפורשת</li>
+                                    <li>לשאלות ובקשות רישוי - צרו קשר עם אושרת רון</li>
+                                </ul>
+                            </div>
+
+                            <div class="instruction-section">
+                                <h3>📱 נגישות ומובייל</h3>
+                                <ul>
+                                    <li>✓ האפליקציה מותאמת למכשירי מובייל וטאבלט</li>
+                                    <li>✓ גרירה בנגיעה ובעכבר</li>
+                                    <li>✓ כפתורים גדולים לשימוש נוח</li>
+                                    <li>✓ תמיכה בהדפסה מכל המכשירים</li>
+                                </ul>
+                            </div>
+
+                            <div class="instruction-section">
+                                <h3>💡 טיפים לשימוש מיטבי</h3>
+                                <ul>
+                                    <li>📝 השתמשו בקווים הכחולים כמדריך לגובה האותיות</li>
+                                    <li>🎨 הוסיפו תמונות הקשורות למילים שאתם בונים</li>
+                                    <li>💾 השתמשו בתכונת השמירה האוטומטית</li>
+                                    <li>🎆 תרגלו בניית מילים באופן הדרגתי</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="instructions-footer">
+                            <button onclick="this.parentElement.parentElement.parentElement.remove()" class="close-instructions-btn">הבנתי, בואו נתחיל! 🚀</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add modal styles
+                const styles = `
+                    <style>
+                    .instructions-modal {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.8);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 1000;
+                        backdrop-filter: blur(5px);
+                        animation: fadeIn 0.3s ease;
+                    }
+                    .instructions-content {
+                        background: white;
+                        border-radius: 20px;
+                        max-width: 800px;
+                        max-height: 90vh;
+                        margin: 20px;
+                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                        overflow: hidden;
+                        animation: slideIn 0.3s ease;
+                        direction: rtl;
+                        text-align: right;
+                        font-family: 'Rubik', sans-serif;
+                    }
+                    .instructions-header {
+                        background: linear-gradient(135deg, #1976d2, #42a5f5);
+                        color: white;
+                        padding: 20px 30px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .instructions-header h2 {
+                        margin: 0;
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+                    .close-btn {
+                        background: rgba(255, 255, 255, 0.2);
+                        border: none;
+                        color: white;
+                        font-size: 28px;
+                        cursor: pointer;
+                        padding: 5px 12px;
+                        border-radius: 50%;
+                        transition: background 0.3s ease;
+                    }
+                    .close-btn:hover {
+                        background: rgba(255, 255, 255, 0.3);
+                    }
+                    .instructions-body {
+                        padding: 30px;
+                        max-height: 60vh;
+                        overflow-y: auto;
+                    }
+                    .instruction-section {
+                        margin-bottom: 25px;
+                        padding: 20px;
+                        background: #f8f9fa;
+                        border-radius: 12px;
+                        border-right: 4px solid #1976d2;
+                    }
+                    .instruction-section.copyright-section {
+                        background: #fff3e0;
+                        border-right: 4px solid #ff9800;
+                    }
+                    .instruction-section h3 {
+                        margin: 0 0 15px 0;
+                        color: #1976d2;
+                        font-size: 18px;
+                        font-weight: 600;
+                    }
+                    .copyright-section h3 {
+                        color: #ff9800;
+                    }
+                    .instruction-section ul {
+                        margin: 0;
+                        padding-right: 20px;
+                        list-style: none;
+                    }
+                    .instruction-section li {
+                        margin-bottom: 8px;
+                        font-size: 16px;
+                        line-height: 1.5;
+                    }
+                    .instructions-footer {
+                        padding: 20px 30px;
+                        background: #f8f9fa;
+                        text-align: center;
+                        border-top: 1px solid #e0e0e0;
+                    }
+                    .close-instructions-btn {
+                        background: linear-gradient(135deg, #1976d2, #42a5f5);
+                        color: white;
+                        border: none;
+                        padding: 12px 30px;
+                        border-radius: 25px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+                    }
+                    .close-instructions-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideIn {
+                        from { transform: translateY(-50px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                    @media (max-width: 768px) {
+                        .instructions-content {
+                            max-width: 95%;
+                            margin: 10px;
+                        }
+                        .instructions-header {
+                            padding: 15px 20px;
+                        }
+                        .instructions-header h2 {
+                            font-size: 20px;
+                        }
+                        .instructions-body {
+                            padding: 20px;
+                        }
+                        .instruction-section {
+                            padding: 15px;
+                        }
+                        .instruction-section h3 {
+                            font-size: 16px;
+                        }
+                        .instruction-section li {
+                            font-size: 14px;
+                        }
+                    }
+                    </style>
+                `;
+                
+                modal.innerHTML = styles + modal.innerHTML;
+                document.body.appendChild(modal);
+                
+                // Close modal when clicking outside
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+                
+                // Close modal with Escape key
+                const escHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        modal.remove();
+                        document.removeEventListener('keydown', escHandler);
+                    }
+                };
+                document.addEventListener('keydown', escHandler);
+            }
+            saveToStorage() {
+                const data = {
+                    tiles: this.tiles.map(tile => {
+                        // Handle nikud tiles with images
+                        if (tile.classList.contains('nikud')) {
+                            return {
+                                char: tile.dataset.char || tile.textContent,
+                                className: tile.className,
+                                left: tile.style.left,
+                                top: tile.style.top,
+                                isNikud: true
+                            };
+                        } else {
+                            return {
+                                char: tile.textContent,
+                                className: tile.className,
+                                left: tile.style.left,
+                                top: tile.style.top,
+                                isNikud: false
+                            };
+                        }
+                    }),
+                    teacherWord: document.getElementById('teacherWord').value,
+                    uploadedImage: this.uploadedImage,
+                    bandHeight: this.bandHeight
+                };
+                
+                // Save only if there are changes
+                const currentData = localStorage.getItem('montessori-app');
+                if (JSON.stringify(data) !== currentData) {
+                    localStorage.setItem('montessori-app', JSON.stringify(data));
+                }
+            }
+            loadFromStorage() {
+                const saved = localStorage.getItem('montessori-app');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        
+                        // Restore tiles
+                        data.tiles.forEach(tileData => {
+                            const tile = document.createElement('div');
+                            tile.className = tileData.className;
+                            tile.style.left = tileData.left;
+                            tile.style.top = tileData.top;
+                            
+                            // Handle nikud tiles
+                            if (tileData.isNikud) {
+                                // Use image for nikud
+                                const imagePath = this.getNikudImagePath(tileData.char);
+                                if (imagePath) {
+                                    const img = document.createElement('img');
+                                    img.src = imagePath;
+                                    img.alt = tileData.char;
+                                    img.style.width = '100%';
+                                    img.style.height = '100%';
+                                    img.style.objectFit = 'contain';
+                                    tile.appendChild(img);
+                                    tile.dataset.char = tileData.char;
+                                } else {
+                                    tile.textContent = tileData.char;
+                                }
+                            } else {
+                                tile.textContent = tileData.char;
+                            }
+                            
+                            if (tile.classList.contains('dot')) {
+                                this.applyDotSize(tile);
+                            }
+                            
+                            document.getElementById('board').appendChild(tile);
+                            this.tiles.push(tile);
+                        });
+                        
+                        // Restore band height
+                        this.bandHeight = data.bandHeight || 55;
+                        document.documentElement.style.setProperty('--band-h', `${this.bandHeight}px`);
+                        
+                        // Restore teacher word
+                        document.getElementById('teacherWord').value = data.teacherWord || '';
+                        document.getElementById('wordDisplay').textContent = data.teacherWord || '';
+                        
+                        // Restore uploaded image
+                        this.uploadedImage = data.uploadedImage || null;
+                        const imageDisplay = document.getElementById('imageDisplay');
+                        if (this.uploadedImage) {
+                            const img = new Image();
+                            img.onload = () => {
+                                const aspectRatio = img.width / img.height;
+                                const container = imageDisplay;
+                                
+                                // Set container aspect ratio based on image
+                                if (aspectRatio > 1) {
+                                    container.style.aspectRatio = '16/9';
+                                } else if (aspectRatio < 1) {
+                                    container.style.aspectRatio = '9/16';
+                                } else {
+                                    container.style.aspectRatio = '1/1';
+                                }
+                                
+                                container.innerHTML = `<img src="${this.uploadedImage}" alt="Uploaded image">`;
+                            };
+                            img.src = this.uploadedImage;
+                        } else {
+                            imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
+                        }
+                    } catch (e) {
+                        console.error('Failed to load saved data:', e);
+                    }
+                }
+            }
+            applyDotSize(tile) {
+                // This function is kept for compatibility but won't be used
+                // since we removed the dot size functionality
+                const baseSize = 48;
+                tile.style.fontSize = baseSize + 'px';
+                tile.style.width = (baseSize + 8) + 'px';
+                tile.style.height = (baseSize + 8) + 'px';
+            }
+            removeImage() {
+                const imageDisplay = document.getElementById('imageDisplay');
+                imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
+                this.uploadedImage = null;
+                this.saveState();
+            }
+        }
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new MontessoriApp();
+        });
+        
+        // Prevent context menu on right click
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Print-time clones of word and image in same layer as tiles
+        (function(){
+            function createPrintClones(){
+                const board = document.getElementById('board');
+                if (!board) return;
+                // Remove previous clones
+                board.querySelectorAll('.print-word, .print-image').forEach(n=>n.remove());
+
+                // Do not clone teacher word; keep only the header text on print
+
+                // Clone image from imageDisplay if exists
+                const imgEl = document.querySelector('#imageDisplay img');
+                if (imgEl && imgEl.src) {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'print-image';
+                    // Position at bottom-left edge so it won't interfere with letters
+                    wrap.style.left = '15mm'; // Increase margin to prevent cutting off
+                    wrap.style.bottom = '36mm'; // Adjust bottom position, ~3 points down
+                    wrap.style.left = '50%';
+                    wrap.style.transform = 'translateX(-50%)';
+                    wrap.style.maxWidth = '16%';
+                    wrap.style.maxHeight = '20%';
+                    wrap.style.display = 'flex';
+                    wrap.style.alignItems = 'center';
+                    wrap.style.justifyContent = 'center';
+                    const img = document.createElement('img');
+                    img.src = imgEl.src;
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '100%';
+                    img.style.objectFit = 'contain';
+                    wrap.appendChild(img);
+                    board.appendChild(wrap);
+                }
+            }
+            function removePrintClones(){
+                const board = document.getElementById('board');
+                if (!board) return;
+                board.querySelectorAll('.print-word, .print-image').forEach(n=>n.remove());
+            }
+            window.addEventListener('beforeprint', createPrintClones);
+            window.addEventListener('afterprint', removePrintClones);
+        })();
+    </script>
+</body>
+</html>
