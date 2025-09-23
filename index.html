@@ -416,7 +416,8 @@
                 inset -2px -2px 6px rgba(0,0,0,0.1),
                 0 -4px 12px rgba(0,0,0,0.15);
             position: relative;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: calc(env(safe-area-inset-bottom) + 96px); /* extra space so last row is easy to tap */
+            scroll-padding-bottom: 96px;
         }
         .dock-tile {
             padding: 12px 16px;
@@ -852,7 +853,13 @@
                 -webkit-overflow-scrolling: touch;
             }
             .main-content > .dock { display: flex; }
-            .dock { max-height: 40vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            .dock {
+                max-height: 48vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
+                scroll-padding-bottom: 120px;
+            }
         }
         @media print {
             /* Set page to landscape orientation with minimal margins */
@@ -1187,6 +1194,30 @@
                 this.loadFromStorage();
                 this.saveState();
             }
+            isIOSiPad() {
+                const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+                const iPad = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                return iPad;
+            }
+            captureScreenshot() {
+                const target = document.querySelector('.app') || document.body;
+                html2canvas(target, { scale: 2, backgroundColor: null, useCORS: true }).then(canvas => {
+                    const dataURL = canvas.toDataURL('image/png');
+                    try {
+                        const a = document.createElement('a');
+                        a.href = dataURL;
+                        a.download = 'screenshot.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    } catch (e) {
+                        /* no-op */
+                    }
+                    try { window.open(dataURL, '_blank'); } catch (e) { /* Safari fallback best-effort */ }
+                }).catch(() => {
+                    try { window.print(); } catch (e) { /* ignore */ }
+                });
+            }
             buildSideDock() {
                 const sidebar = document.querySelector('.sidebar');
                 const dock = document.getElementById('dock');
@@ -1303,7 +1334,20 @@
                 document.getElementById('redoBtn').addEventListener('click', () => this.redo());
                 document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
                 document.getElementById('clearNikudBtn').addEventListener('click', () => this.clearNikud());
-                document.getElementById('printBtn').addEventListener('click', () => this.printToPDF());
+                const printBtn = document.getElementById('printBtn');
+                if (printBtn) {
+                    // On iPad, prefer screenshot over print
+                    if (this.isIOSiPad()) {
+                        try { printBtn.textContent = 'צילום מסך'; } catch (_) {}
+                    }
+                    printBtn.addEventListener('click', () => {
+                        if (this.isIOSiPad()) {
+                            this.captureScreenshot();
+                        } else {
+                            this.printToPDF();
+                        }
+                    });
+                }
                 document.getElementById('instructionsBtn').addEventListener('click', () => this.showInstructions());
                 document.getElementById('removeImageBtn').addEventListener('click', () => this.removeImage());
                 
