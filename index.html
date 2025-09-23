@@ -184,6 +184,23 @@
             background: var(--bg-color);
             touch-action: none;
         }
+        .board-image-overlay {
+            position: absolute;
+            left: 50%;
+            bottom: 12px;
+            transform: translateX(-50%);
+            z-index: 1;
+            max-width: 30%;
+            max-height: 30%;
+            opacity: 0.95;
+            pointer-events: none;
+        }
+        .board-image-overlay img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
         .board {
             position: absolute;
             top: 0;
@@ -992,12 +1009,21 @@
                 transition: transform 0.3s ease;
                 z-index: 200;
                 box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+                overflow-y: auto;
+                padding-bottom: env(safe-area-inset-bottom);
             }
             .sidebar.sidebar--open { transform: translateX(0); }
             .menu-toggle { display: inline-flex; align-items: center; gap: 8px; }
             .word-display { font-size: clamp(24px, 6vw, 40px); }
             .toolbar input[type="text"] { width: min(55vw, 220px); }
             .image-display { max-height: 30vh; }
+            .toolbar { flex-wrap: nowrap; overflow-x: auto; gap: 8px; }
+            .toolbar button:not(#menuToggle) { display: none; }
+            .main-content > .dock { display: none; }
+            .dock { max-height: none; overflow-y: auto; }
+            .sidebar-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+            .sidebar-actions button { width: 100%; }
+            .sidebar-dock-container { margin-top: 12px; }
         }
     </style>
 </head>
@@ -1021,6 +1047,7 @@
                 <div class="word-display" id="wordDisplay"></div>
                 <div class="board-container">
                     <div class="board" id="board">
+                        <div class="board-image-overlay" id="boardImageOverlay"></div>
                         <!-- Print margin indicators -->
                         <div class="print-margins">
                             <div class="print-margin-indicator print-margin-left"></div>
@@ -1157,6 +1184,8 @@
                 </div>
                 <button class="upload-btn" id="uploadImageBtn">העלה תמונה</button>
                 <input type="file" id="imageInput" class="file-input" accept="image/*" />
+                <div class="sidebar-actions" id="sidebarActions"></div>
+                <div class="sidebar-dock-container" id="sidebarDockContainer"></div>
             </div>
         </div>
         
@@ -1195,6 +1224,7 @@
                 this.buildSideDock();
                 this.calculateBandHeight();
                 this.loadFromStorage();
+                this.updateBoardImageOverlay();
                 this.saveState();
             }
             buildSideDock() {
@@ -1403,11 +1433,23 @@
                         
                         container.appendChild(newImg);
                         this.uploadedImage = e.target.result;
+                        this.updateBoardImageOverlay();
                         this.saveState();
                     };
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
+            }
+            updateBoardImageOverlay() {
+                const overlay = document.getElementById('boardImageOverlay');
+                if (!overlay) return;
+                overlay.innerHTML = '';
+                if (this.uploadedImage) {
+                    const img = document.createElement('img');
+                    img.src = this.uploadedImage;
+                    img.alt = 'Board image';
+                    overlay.appendChild(img);
+                }
             }
             getPointerPos(e) {
                 const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
@@ -1763,6 +1805,7 @@
                     imageDisplay.innerHTML = '<div class="placeholder">גרור תמונה לכאן</div>';
                 }
             }
+            this.updateBoardImageOverlay();
             clearAll() {
                 if (this.tiles.length === 0) {
                     this.showNotification('הלוח כבר ריק!');
@@ -2235,7 +2278,10 @@
         
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            new MontessoriApp();
+            const app = new MontessoriApp();
+            if (app && typeof app.updateBoardImageOverlay === 'function') {
+                app.updateBoardImageOverlay();
+            }
 
             // Mobile drawer toggle
             const menuBtn = document.getElementById('menuToggle');
@@ -2268,6 +2314,44 @@
             const mq = window.matchMedia('(min-width: 769px)');
             const handleMQ = (e) => { if (e.matches) closeSidebar(); };
             if (mq.addEventListener) mq.addEventListener('change', handleMQ); else if (mq.addListener) mq.addListener(handleMQ);
+
+            // Reflow controls for mobile: move toolbar buttons and dock into sidebar
+            const toolbar = document.querySelector('.toolbar');
+            const teacherWord = document.getElementById('teacherWord');
+            const sidebarActions = document.getElementById('sidebarActions');
+            const sidebarDockContainer = document.getElementById('sidebarDockContainer');
+            const dock = document.getElementById('dock');
+            const toolbarBtns = toolbar ? Array.from(toolbar.querySelectorAll('button')).filter(b => b.id !== 'menuToggle') : [];
+            let dockPlaceholder = null;
+            if (dock && dock.parentNode) {
+                dockPlaceholder = document.createElement('div');
+                dockPlaceholder.id = 'dockPlaceholder';
+                dockPlaceholder.style.display = 'none';
+                dock.parentNode.insertBefore(dockPlaceholder, dock);
+            }
+            const reflow = () => {
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                if (isMobile) {
+                    if (sidebarActions) {
+                        toolbarBtns.forEach(btn => sidebarActions.appendChild(btn));
+                    }
+                    if (sidebarDockContainer && dock) {
+                        sidebarDockContainer.appendChild(dock);
+                    }
+                } else {
+                    if (teacherWord) {
+                        for (let i = toolbarBtns.length - 1; i >= 0; i--) {
+                            teacherWord.insertAdjacentElement('afterend', toolbarBtns[i]);
+                        }
+                    }
+                    if (dockPlaceholder && dock && dockPlaceholder.parentNode) {
+                        dockPlaceholder.parentNode.insertBefore(dock, dockPlaceholder);
+                    }
+                }
+            };
+            reflow();
+            const mm = window.matchMedia('(max-width: 768px)');
+            if (mm.addEventListener) mm.addEventListener('change', reflow); else if (mm.addListener) mm.addListener(reflow);
         });
         
         // Prevent context menu on right click
