@@ -1950,7 +1950,7 @@
                             <div class="instruction-section">
                                 <h3>📱 נגישות ומובייל</h3>
                                 <ul>
-                                    <li>✓ האפליקציה מותאמת למכשירי מובייל וטאבלט</li>
+                                    <li>⚠ היישומון מותאם למחשב בלבד ואינו מותאם לשימוש במובייל או טאבלט/אייפד</li>
                                     <li>✓ גרירה בנגיעה ובעכבר</li>
                                     <li>✓ כפתורים גדולים לשימוש נוח</li>
                                     <li>✓ תמיכה בהדפסה מכל המכשירים</li>
@@ -2287,9 +2287,77 @@
             }
         }
         
+        // Welcome modal (Rubik font, desktop-only note)
+        function showWelcomeModal() {
+            if (localStorage.getItem('montessori-welcome-dismissed') === '1') return;
+
+            const modal = document.createElement('div');
+            modal.className = 'welcome-modal';
+            modal.innerHTML = `
+                <div class="welcome-content">
+                    <div class="welcome-header">
+                        <h2>ברוכים הבאים ל״אותיות נעות – מונטסורי״</h2>
+                    </div>
+                    <div class="welcome-body">
+                        <p>
+                            יישומון ידידותי לתרגול ולהרכבת מילים בעברית באמצעות אריחי אותיות וניקוד,
+                            בהשראת הגישה המונטסורית.
+                        </p>
+                        <p class="desktop-note">⚠ לתצוגה ולחוויית שימוש מיטבית היישומון מותאם למחשב שולחני בלבד ואינו מיועד למובייל או טאבלט/אייפד.</p>
+                        <p class="credit">היישומון נבנה על ידי אושרת רון. כל הזכויות שמורות.</p>
+                        <label class="dont-show">
+                            <input type="checkbox" id="dontShowWelcome"> אל תציג שוב
+                        </label>
+                    </div>
+                    <div class="welcome-actions">
+                        <button class="primary-btn" id="startAppBtn">הבנתי, נתחיל!</button>
+                        <button class="secondary-btn" id="openInstructionsBtn">הוראות מלאות</button>
+                    </div>
+                </div>
+                <style>
+                    .welcome-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1200;animation:fadeIn .25s ease}
+                    .welcome-content{direction:rtl;background:#fff;border-radius:20px;max-width:720px;width:92%;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden;font-family:'Rubik','Noto Sans Hebrew',sans-serif}
+                    .welcome-header{padding:22px 28px;background:linear-gradient(135deg,#ffffff,#f4f8ff);border-bottom:1px solid #e6eaf2}
+                    .welcome-header h2{margin:0;font-size:24px;color:#1a237e;font-weight:700;letter-spacing:.2px}
+                    .welcome-body{padding:22px 28px;color:#333;line-height:1.7;font-size:16px}
+                    .welcome-body p{margin:0 0 12px 0}
+                    .welcome-body .desktop-note{background:#fff3e0;border-right:4px solid #ff9800;padding:10px 12px;border-radius:10px}
+                    .dont-show{display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;color:#555}
+                    .welcome-actions{display:flex;gap:12px;justify-content:center;padding:18px 24px;background:#f8f9fa;border-top:1px solid #e6eaf2}
+                    .primary-btn{background:linear-gradient(135deg,#1976d2,#42a5f5);color:#fff;border:none;padding:10px 22px;border-radius:999px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(25,118,210,.3);transition:transform .15s ease}
+                    .primary-btn:hover{transform:translateY(-1px)}
+                    .secondary-btn{background:#fff;color:#1976d2;border:1px solid #cfe1f6;padding:10px 18px;border-radius:999px;font-weight:600;cursor:pointer}
+                    @media (max-width:768px){.welcome-header h2{font-size:20px}.welcome-body{font-size:15px}}
+                </style>
+            `;
+
+            // Close handlers
+            const cleanup = () => modal.remove();
+            modal.addEventListener('click', (e) => { if (e.target === modal) cleanup(); });
+            document.addEventListener('keydown', function esc(e){ if(e.key==='Escape'){ cleanup(); document.removeEventListener('keydown', esc); }});
+
+            document.body.appendChild(modal);
+
+            // Buttons
+            modal.querySelector('#startAppBtn').addEventListener('click', () => {
+                const dont = modal.querySelector('#dontShowWelcome').checked;
+                if (dont) localStorage.setItem('montessori-welcome-dismissed','1');
+                cleanup();
+            });
+            modal.querySelector('#openInstructionsBtn').addEventListener('click', () => {
+                const dont = modal.querySelector('#dontShowWelcome').checked;
+                if (dont) localStorage.setItem('montessori-welcome-dismissed','1');
+                cleanup();
+                if (window.montessoriApp && typeof window.montessoriApp.showInstructions === 'function') {
+                    window.montessoriApp.showInstructions();
+                }
+            });
+        }
+
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            new MontessoriApp();
+            window.montessoriApp = new MontessoriApp();
+            showWelcomeModal();
         });
         
         // Prevent context menu on right click
